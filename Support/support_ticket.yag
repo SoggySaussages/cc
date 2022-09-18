@@ -1,0 +1,41 @@
+{{/* CC #05 */}}
+{{$ := .ExecData}}
+{{$supportTypes := sdict
+    "❓" "4"
+    "UpPromote:1020083096370028574" "2"
+    "PayPal:1020083375232532590" "3"
+    "Discord:1020083926288568411" "0"
+    "Shopify:1020464765472088104" "1"
+    }}
+{{$supportType := $supportTypes.Get $.Reaction.Emoji.APIName}}
+{{$supportPackages := cslice 
+(sdict "AdminsOnly" true "Title" "AffiliFire Server" "Description" "Thanks for opening a ticket. We're sorry to hear of your difficulties with the server, we've let administration know of your issue.\n\nWhile we wait, **please give a short description of your problem**, and attach any extra info (screenshots, etc.) that may help." "FAQ" (cslice (sdict "name" "How do I gain access to the server?" "value" "To gain access, please agree to our Terms and Conditions in <#1019412964161355796>.") (sdict "name" "How do I see the seller materials?" "value" "To gain access to our resources for sellers, you'll need to submit a quick application. You can do so in <#1019413242197573702>")))
+(sdict "AdminsOnly" false "Title" "Products" "Description" "Thanks for opening a ticket. An affiliate manager will be by shortly to chat with you about our current product lineup.\n\nWhile we wait, **please give a short description of your inquiry**." "FAQ" (cslice))
+(sdict "AdminsOnly" false "Title" "UpPromote" "Description" "Thanks for opening a ticket. We're sorry to hear of your difficulties with UpPromote, we've let our affiliate managers know of your issue.\n\nWhile we wait, **please give a short description of your problem**, and attach any extra info (screenshots, etc.) that may help." "FAQ" (cslice))
+(sdict "AdminsOnly" true "Title" "Payment/Financial" "Description" "Thanks for opening a ticket. We're sorry to hear of your difficulties with getting paid, we've let the staff know of your issue.\n\nWhile we wait, **please give a short description of your problem**, and attach any extra info (screenshots, etc.) that may help." "FAQ" (cslice (sdict "name" "How do I get paid?" "value" "You can cash out on your earnings at the UpPromote dashboard. (Here's a link!)[https://images.pexels.com/photos/39317/chihuahua-dog-puppy-cute-39317.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2]")))
+(sdict "AdminsOnly" false "Title" "General" "Description" "Thanks for opening a ticket. We've let our staff know of your issue.\n\nWhile we wait, **please give a short description of your problem**, and attach any extra info (screenshots, etc.) that may help." "FAQ" (cslice))
+}}
+{{$package := index $supportPackages (int $supportType)}}
+{{if $package.AdminsOnly}}
+    {{$silent := execAdmin "tickets adminsonly"}}
+{{end}}
+{{if $package.FAQ}}
+    {{sendMessage nil (cembed
+        "title" (print $package.Title " Support Ticket - " $.User.String)
+        "description" $package.Description
+        "color" (randInt 11111111 15000000)
+        "timestamp" currentTime
+        "footer" (sdict "text" "Thanks for your patience :)")
+        "fields" $package.FAQ
+    )
+    }}
+{{else}}
+    {{sendMessage nil (cembed
+        "title" (print $package.Title " Support Ticket - " $.User.String)
+        "description" $package.Description
+        "color" (randInt 11111111 15000000)
+        "timestamp" currentTime
+        "footer" (sdict "text" "Thanks for your patience :)")
+    )
+    }}
+{{end}}
