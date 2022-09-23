@@ -1,0 +1,10 @@
+{{ if ($target := userArg (toInt (reFind `\d{17,}` .Message.Content))) }}
+    {{ if in .Message.Content "unregister" }}
+        {{ dbSet $target.ID "memberProfile" (($profile := (dbGet $target.ID "memberProfile").Value).Set "Staff" false) }}
+        {{ printf "**%s** was unlogged as a staff member." (or (getMember $target.ID).Nick $target.Username) }}
+    {{ else }}
+        {{ dbSet $target.ID "memberProfile" (($profile := (dbGet $target.ID "memberProfile").Value).Set "Staff" true) }}
+        {{ printf "**%s** was logged as a staff member." (or (getMember $target.ID).Nick $target.Username) }}
+{{ else }}
+You must specify a staff member by ID or mention. You may also use `-staff unregister` to remove a staff member.
+{{ end }}
