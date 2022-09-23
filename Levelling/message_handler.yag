@@ -39,18 +39,18 @@
 {{ end }}
 
 {{ with $cooldownsNew }}
-    {{ dbSet .User.ID "cooldowns" . }}
+    {{ dbSet $.User.ID "cooldowns" . }}
 {{ end }}
 
 {{ with $xpAdd }}
     {{ $xpAdd = toInt (round (mult (fdiv (randInt 100 130) 100) (dbGet 0 "xpMultiplier").Value $xpAdd)) }}
     {{ $debug = dbIncr .User.ID "xp" $xpAdd }}
     {{ execCC 8 nil 0 false }}
-    {{ if in .Message.Content "debugTestXP" }}
+    {{ if in $.Message.Content "debugTestXP" }}
         {{ $debug }}
     {{ end }}
 {{ else }}
-    {{ if in .Message.Content "debugTestXP" }}
+    {{ if in $.Message.Content "debugTestXP" }}
         No xp added
     {{ end }}
 {{ end }}
