@@ -44,7 +44,7 @@
 
 {{ with $xpAdd }}
     {{ $xpAdd = toInt (round (mult (fdiv (randInt 100 130) 100) (dbGet 0 "xpMultiplier").Value $xpAdd)) }}
-    {{ $debug = dbIncr .User.ID "xp" $xpAdd }}
+    {{ $debug = dbIncr $.User.ID "xp" $xpAdd }}
     {{ execCC 8 nil 0 false }}
     {{ if in $.Message.Content "debugTestXP" }}
         {{ $debug }}
