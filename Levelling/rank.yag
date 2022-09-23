@@ -26,23 +26,29 @@
 {{ end }}
 
 {{ $fireLevel.Set "Progress" (round (mult (fdiv $fireLevel.NewXP $fireLevel.NeededXP) 100)) }}
-{{ range (seq 0 (add 1 (div (toInt $fireLevel.Progress) 10))) }}
+{{ try }}
+{{ range (seq 1 (toInt (div $fireLevel.Progress 10))) }}
     {{ $fireLevel.Set "ProgressBar" (print (or $fireLevel.ProgressBar "") "🟩") }}
 {{ end }}
-{{ range (seq (div $fireLevel.Progress 10) 11) }}
+{{ catch }}
+{{ end }}
+{{ range (seq (div (toInt $fireLevel.Progress) 10) 10) }}
     {{ $fireLevel.Set "ProgressBar" (print (or $fireLevel.ProgressBar "") "⬜") }}
 {{ end }}
 
 {{ $embed := cembed
     "title" (printf "%s is ranked #%d on AffiliFire!" (or $.Member.Nick $.User.Username) $fireLevel.Rank)
     "fields" (cslice
-    (sdict "name" (or $fireLevel.NewLevel $fireLevel.Level) "value" "Current Level" "inline" true)
-    (sdict "name" (add 1 (or $fireLevel.NewLevel $fireLevel.Level)) "value" "Next Level" "inline" true)
-    (sdict "name" $fireLevel.XP "value" "Current XP" "inline" true)
-    (sdict "name" (add $fireLevel.TrackedXP $fireLevel.NeededXP) "value" "XP Needed" "inline" true)
-    (sdict "name" (printf "%d%% of the way to level %d!" $fireLevel.Progress (add 1 (or $fireLevel.NewLevel $fireLevel.Level))) "value" $fireLevel.ProgressBar)
+    (sdict "name" (str (toInt (or $fireLevel.NewLevel $fireLevel.Level))) "value" "Current Level" "inline" true)
+    (sdict "name" "\u200b" "value" "\u200b" "inline" true)
+    (sdict "name" (str (toInt (add 1 (or $fireLevel.NewLevel $fireLevel.Level)))) "value" "Next Level" "inline" true)
+    (sdict "name" (str (toInt $fireLevel.XP)) "value" "Current XP" "inline" true)
+    (sdict "name" "\u200b" "value" "\u200b" "inline" true)
+    (sdict "name" (str (toInt (add $fireLevel.TrackedXP $fireLevel.NeededXP))) "value" "XP Needed" "inline" true)
+    (sdict "name" (printf "%d%% of the way to level %d!" (toInt $fireLevel.Progress) (toInt (add 1 (or $fireLevel.NewLevel $fireLevel.Level)))) "value" $fireLevel.ProgressBar)
     )
     "color" (randInt 10000000 15000000)
     "footer" (sdict "text" "-rank")
     "thumbnail" (sdict "url" ($.User.AvatarURL "1024"))
 }}
+{{ sendMessage nil $embed }}
