@@ -1,11 +1,13 @@
 {{ if ($target := userArg (toInt (reFind `\d{17,}` .Message.Content))) }}
     {{ if in .Message.Content "unregister" }}
         {{ $profile := (dbGet $target.ID "memberProfile").Value }}
-        {{ dbSet $target.ID "memberProfile" ($profile.Set "Staff" false) }}
+        {{ $profile.Set "Staff" false }}
+        {{ dbSet $target.ID "memberProfile" $profile }}
         {{ printf "**%s** was unlogged as a staff member." (or (getMember $target.ID).Nick $target.Username) }}
     {{ else }}
         {{ $profile := (dbGet $target.ID "memberProfile").Value }}
-        {{ dbSet $target.ID "memberProfile" ($profile.Set "Staff" true) }}
+        {{ $profile.Set "Staff" true }}
+        {{ dbSet $target.ID "memberProfile" $profile }}
         {{ printf "**%s** was logged as a staff member." (or (getMember $target.ID).Nick $target.Username) }}
     {{ end }}
 {{ else }}
