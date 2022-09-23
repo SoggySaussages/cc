@@ -26,7 +26,7 @@
 {{ end }}
 
 {{ $fireLevel.Set "Progress" (round (mult (fdiv $fireLevel.NewXP $fireLevel.NeededXP) 100)) }}
-{{ range (seq 0 (add 1 (div $fireLevel.Progress 10))) }}
+{{ range (seq 0 (add 1 (div (toInt $fireLevel.Progress) 10))) }}
     {{ $fireLevel.Set "ProgressBar" (print (or $fireLevel.ProgressBar "") "🟩") }}
 {{ end }}
 {{ range (seq (div $fireLevel.Progress 10) 11) }}
