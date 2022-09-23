@@ -1,8 +1,8 @@
-{{ $ = . }}
+{{ $ = sdict }}
 {{ $.Set "User" (or (userArg (toInt (reFind `\d{17,}` .Message.Content))) .User)}}
 {{ $.Set "Member" (getMember $.User.ID)}}
 
-{{ $fireLevel := or (dbGet $.User.ID "fireLevel").Value sdict ("Level" 0 "TrackedXP" 0) }}
+{{ $fireLevel := or (dbGet $.User.ID "fireLevel").Value (sdict "Level" 0 "TrackedXP" 0) }}
 {{ $fireLevel.Set "XP" (dbGet $.User.ID "xp").Value }}
 {{ $fireLevel.Set "NeededXP" (add 100 (mult 50 $fireLevel.Level) (mult 5 (pow $fireLevel.Level 2))) }}
 {{ $fireLevel.Set "NewXP" (sub $fireLevel.XP $fireLevel.TrackedXP) }}
