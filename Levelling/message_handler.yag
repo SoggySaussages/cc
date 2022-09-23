@@ -15,7 +15,7 @@
     {{ end }}
 {{ end }}
 
-{{ if not in $cooldownsSimple "messageXP" }}
+{{ if not (in $cooldownsSimple "messageXP") }}
     {{ $xpAdd = 10 }}
     {{ $cooldownsNew = $cooldownsNew.AppendSlice (cslice (sdict "Cooldown" "messageXP" "Expiry" (currentTime.Add (toDuration "1m")))) }}
 {{ end }}
@@ -24,7 +24,7 @@
     {{ if and (in .Content "?") (not (in $cooldownsSimple "questionReplyXP")) }}
         {{ $xpAdd = 14 }}
         {{ $cooldownsNew = $cooldownsNew.AppendSlice (cslice (sdict "Cooldown" "questionReplyXP" "Expiry" (currentTime.Add (toDuration "90s")))) }}
-    {{ else if not in $cooldownsSimple "replyXP" }}
+    {{ else if not (in $cooldownsSimple "replyXP") }}
         {{ $xpAdd = 12 }}
         {{ $cooldownsNew = $cooldownsNew.AppendSlice (cslice (sdict "Cooldown" "replyXP" "Expiry" (currentTime.Add (toDuration "75s")))) }}
     {{ end }}

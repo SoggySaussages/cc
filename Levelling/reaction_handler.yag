@@ -11,10 +11,10 @@
     {{ end }}
 {{ end }}
 
-{{ if and (not in $cooldownsSimple "reactXP") (dbGet .Message.Author.ID "memberProfile").Staff }}
+{{ if and (not (in $cooldownsSimple "reactXP")) (dbGet .Message.Author.ID "memberProfile").Staff }}
     {{ $xpAdd = 6 }}
     {{ $cooldownsNew = $cooldownsNew.AppendSlice (cslice (sdict "Cooldown" "reactXP" "Expiry" (currentTime.Add (toDuration "90s")))) }}
-{{ else if not in $cooldownsSimple "reactXP" }}
+{{ else if not (in $cooldownsSimple "reactXP") }}
     {{ $xpAdd = 8 }}
     {{ $cooldownsNew = $cooldownsNew.AppendSlice (cslice (sdict "Cooldown" "reactXP" "Expiry" (currentTime.Add (toDuration "90s")))) }}
 {{ end }}
