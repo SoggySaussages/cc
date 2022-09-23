@@ -18,6 +18,7 @@
 {{ else }}
     {{ break }}
 {{ end }}
+{{ end }}
 
 {{ if $fireLevel.NewLevel }}
     {{ dbSet $.User.ID "fireLevel" (sdict "Level" $fireLevel.NewLevel "TrackedXP" $fireLevel.TrackedXP) }}
