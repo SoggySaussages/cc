@@ -36,10 +36,10 @@
 {{ $embed := cembed
     "title" (printf "%s is ranked #%d on AffiliFire!" (or $.Member.Nick $.User.Username) $fireLevel.Rank)
     "fields" (cslice
-    (sdict "name" (or $fireLevel.NewLevel $fireLevel.Level) "value" "Current Level" "inline" "true")
-    (sdict "name" (add 1 (or $fireLevel.NewLevel $fireLevel.Level)) "value" "Next Level" "inline" "true")
-    (sdict "name" $fireLevel.XP "value" "Current XP" "inline" "true")
-    (sdict "name" (add $fireLevel.TrackedXP $fireLevel.NeededXP) "value" "XP Needed" "inline" "true")
+    (sdict "name" (or $fireLevel.NewLevel $fireLevel.Level) "value" "Current Level" "inline" true)
+    (sdict "name" (add 1 (or $fireLevel.NewLevel $fireLevel.Level)) "value" "Next Level" "inline" true)
+    (sdict "name" $fireLevel.XP "value" "Current XP" "inline" true)
+    (sdict "name" (add $fireLevel.TrackedXP $fireLevel.NeededXP) "value" "XP Needed" "inline" true)
     (sdict "name" (printf "%d%% of the way to level %d!" $fireLevel.Progress (add 1 (or $fireLevel.NewLevel $fireLevel.Level))) "value" $fireLevel.ProgressBar)
     )
     "color" (randInt 10000000 15000000)
