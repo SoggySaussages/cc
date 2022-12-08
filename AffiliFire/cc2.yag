@@ -1,0 +1,7 @@
+{{if (dbGet 0 10) }}
+    {{dbDel 0 10}}
+    Toggled off.
+    {{else}}
+    {{dbSet 0 10 1}}
+    Toggled on.
+    {{end}}
