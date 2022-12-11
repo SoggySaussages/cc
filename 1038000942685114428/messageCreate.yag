@@ -1,5 +1,1 @@
-{{return}}
-{{if eq .User.ID .BotUser.ID}}
-    {{return}}
-{{end}}
-{{sendMessage 1051352470221230141 "DEBUG: msgtrigger OPT"}}
+{{sendMessage 1051352470221230141 (print "DEBUG: msgtrigger OPT\n\ndbginfo:\nUSR=" .User.ID "\nBUR=" .BotUser.ID)}}
