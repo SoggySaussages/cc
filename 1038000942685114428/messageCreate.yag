@@ -1,4 +1,4 @@
-{{if eq .User.ID 959843488193732629}}
+{{if eq .User.ID .BotUser.ID}}
     {{return}}
 {{end}}
-{{sendMessage 1051352470221230141 "DEBUG: msgtrigger"}}
+{{sendMessage 1051352470221230141 "DEBUG: msgtrigger OPT"}}
