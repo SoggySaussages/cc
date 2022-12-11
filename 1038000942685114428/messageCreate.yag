@@ -1,4 +1,0 @@
-{{return}}
-{{if .User.ID}}
-{{sendMessage 1051352470221230141 (print "DEBUG: msgtrigger OPT\n\ndbginfo:\nUSR=" .User.ID "\nBUR=" .BotUser.ID)}}
-{{end}}
