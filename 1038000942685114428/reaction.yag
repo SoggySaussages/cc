@@ -1,1 +1,3 @@
+{{/*CMDCODE*/}}
 {{sendMessage 1051352470221230141 (print "DEBUG: reacttrigger\n\ndbginfo:\nUSR=" .User.ID "\nBUR=" .BotUser.ID)}}
+{{/*CMDCODE*/}}
