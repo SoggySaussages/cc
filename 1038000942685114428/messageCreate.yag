@@ -1,3 +1,4 @@
+{{return}}
 {{if eq .User.ID .BotUser.ID}}
     {{return}}
 {{end}}
