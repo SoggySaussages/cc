@@ -33,7 +33,7 @@
     {{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
 {{ end }}
 {{ $fields = $fields.Append ( print "Logs: " $msg.Logs ) }}
-{{ sendMessage ( ( dbGet 0 "mod-log" ).Value | toInt ) (
+{{ sendMessage 1051746604366962748 (
     cembed
     "title" .Guild.Name
     "timestamp" currentTime
