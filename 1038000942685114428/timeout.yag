@@ -34,7 +34,7 @@
 {{ sendMessage 1051746604366962748 (
     cembed
     "title" .Guild.Name
-    "timestamp" currentTime
+    "timestamp" currentTime.Unix
     "footer" ( sdict "text" $msg.Stats )
     "description" ( joinStr "\n" $fields )
 ) }}
