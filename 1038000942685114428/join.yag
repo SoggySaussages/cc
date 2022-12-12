@@ -1,4 +1,3 @@
-DEBUG: Join run
 {{ $db := or ( dbGet .User.ID "member" ).Value (
     sdict
     "OnServer" false
@@ -17,4 +16,3 @@ DEBUG: Join run
     "timestamp" ( snowflakeToTime .User.ID )
     "color" ( randInt 15000 ) ) ) }}
 {{ dbSet .User.ID "member" $db }}
-DEBUG: Join complete

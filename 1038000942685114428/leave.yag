@@ -1,4 +1,3 @@
-DEBUG: Leave run
 {{ $db := or ( dbGet .User.ID "member" ).Value (
     sdict
     "OnServer" false
@@ -7,4 +6,3 @@ DEBUG: Leave run
 ) }}
 {{ $db.Set "OnServer" false }}
 {{ dbSet .User.ID "member" $db }}
-DEBUG: Leave complete
