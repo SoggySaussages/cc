@@ -11,7 +11,7 @@
     "User" .User.ID
     "Reason" .Reason
     "Author" .Author.ID
-    "Until" ( currentTime.Add .Duration )
+    "Until" ( currentTime.Add ( toDuration .Duration ) )
 ) ) }}
 {{ $msg := sdict }}
 {{ $msg.Set "User" ( printf "%s `%s`" .User.Mention .User ) }}
