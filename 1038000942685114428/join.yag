@@ -1,0 +1,19 @@
+{{ $db := or ( dbGet .User.ID "member" ).Value (
+    sdict
+    "OnServer" false
+    "Agreed" false
+    "Staff" false
+) }}
+{{ $db.Set "OnServer" true }}
+{{$ex := or (and (reFind "a_" .Guild.Icon) "gif" ) "png" }}
+{{$icon := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
+{{ sendMessage nil (
+    embed
+    "title" ( printf "%s just joined!" .User .Guild.Name )
+    "author" ( sdict "icon_url" $icon "name" .Guild.Name )
+    "description" ( printf "They are member #%d :)" .Guild.MemberCount )
+    "footer" ( sdict "text" "They've been a member since" )
+    "timestamp" ( snowflakeToTime .User.ID )
+    "color" ( randInt 15000 )
+) }}
+{{ dbSet .User.ID "member" $db }}

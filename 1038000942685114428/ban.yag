@@ -1,0 +1,45 @@
+{{ if not ( dbGet 0 "mod-log" ) }}
+    {{ dbSet 0 "mod-log" 1051746604366962748 }}
+{{ end }}
+{{ $db := or ( dbGet .User.ID "moderation" ).Value ( sdict 
+    "Warns" cslice
+    "Mutes" cslice
+    "Kicks" cslice
+    "Bans" cslice
+) }}
+{{ $db.Set "Bans" ( $db.Bans.Append ( sdict
+    "User" .User.ID
+    "Reason" .Reason
+    "Author" .Author.ID
+    "Until" ( currentTime.Add .Duration )
+) ) }}
+{{ $msg := sdict }}
+{{ $msg.Set "User" ( printf "%s `%s`" .User.Mention .User ) }}
+{{ $msg.Set "Channel" ( printf "%s `%s`" .Channel.Mention .Channel.Name ) }}
+{{ $msg.Set "Moderator" ( printf "%s `%s`" .Author.Mention .Author ) }}
+{{ $msg.Set "Logs" ( printf "[Logs](%s)" ( execAdmin "logs" ) ) }}
+{{ range ( cslice "Warns" "Mutes" "Kicks" "Bans" ) }}
+    {{ if ( $db.Get . ) }}
+        {{ $msg.Set "Stats" ( print ( $msg.Stats ) "%s: %d, " . ( len ( $db.Get . ) ) ) }}
+    {{ end }}
+{{ end }}
+{{ $fields := cslice }}
+{{ $fields = $fields.Append ( print "User: " $msg.User ) }}
+{{ $fields = $fields.Append ( print "Where: " $msg.Channel ) }}
+{{ $fields = $fields.Append ( print "Action: " "Banned" ) }}
+{{ $fields = $fields.Append ( print "Moderator: " $msg.Moderator ) }}
+{{ if .Duration }}
+    {{ $fields = $fields.Append ( print "Until: <t:" $db.Until ":F>" ) }}
+{{ end }}
+{{ if ne .Reason "(No reason specified)" }}
+    {{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
+{{ end }}
+{{ $fields = $fields.Append ( print "Logs: " $msg.Logs ) }}
+{{ sendMessage ( ( dbGet 0 "mod-log" ).Value | toInt ) (
+    cembed
+    "title" .Guild.Name
+    "timestamp" currentTime
+    "footer" ( sdict "text" $msg.Stats )
+    "description" ( joinStr "\n" $fields )
+) }}
+{{ dbSet .User.ID "moderation" $db }}

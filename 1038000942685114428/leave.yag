@@ -1,0 +1,8 @@
+{{ $db := or ( dbGet .User.ID "member" ).Value (
+    sdict
+    "OnServer" false
+    "Agreed" false
+    "Staff" false
+) }}
+{{ $db.Set "OnServer" false }}
+{{ dbSet .User.ID "member" $db }}
