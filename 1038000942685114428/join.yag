@@ -14,7 +14,7 @@ DEBUG: Join run
     "author" ( sdict "icon_url" $icon "name" .Guild.Name )
     "description" ( printf "They are member #%d :)" .Guild.MemberCount )
     "footer" ( sdict "text" "They've been a member since" )
-    "timestamp" ( snowflakeToTime .User.ID ).Unix
+    "timestamp" ( snowflakeToTime .User.ID )
     "color" ( randInt 15000 )
 ) }}
 {{ dbSet .User.ID "member" $db }}
