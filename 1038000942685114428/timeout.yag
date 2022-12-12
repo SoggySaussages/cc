@@ -1,6 +1,4 @@
-{{ if not ( dbGet 0 "mod-log" ) }}
-    {{ dbSet 0 "mod-log" 1051746604366962748 }}
-{{ end }}
+{{ dbSet 0 "mod-log" ( str 1051746604366962748 ) }}
 {{ $db := or ( dbGet .User.ID "moderation" ).Value ( sdict 
     "Warns" cslice
     "Mutes" cslice
