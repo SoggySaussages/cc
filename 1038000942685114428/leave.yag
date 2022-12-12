@@ -1,3 +1,4 @@
+DEBUG: Join run
 {{ $db := or ( dbGet .User.ID "member" ).Value (
     sdict
     "OnServer" false
@@ -6,3 +7,4 @@
 ) }}
 {{ $db.Set "OnServer" false }}
 {{ dbSet .User.ID "member" $db }}
+DEBUG: Join complete

@@ -1,3 +1,4 @@
+DEBUG: Join run
 {{ $db := or ( dbGet .User.ID "member" ).Value (
     sdict
     "OnServer" false
@@ -17,3 +18,4 @@
     "color" ( randInt 15000 )
 ) }}
 {{ dbSet .User.ID "member" $db }}
+DEBUG: Join complete
