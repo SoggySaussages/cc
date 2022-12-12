@@ -1,4 +1,4 @@
-DEBUG: Join run
+DEBUG: Leave run
 {{ $db := or ( dbGet .User.ID "member" ).Value (
     sdict
     "OnServer" false
@@ -7,4 +7,4 @@ DEBUG: Join run
 ) }}
 {{ $db.Set "OnServer" false }}
 {{ dbSet .User.ID "member" $db }}
-DEBUG: Join complete
+DEBUG: Leave complete
