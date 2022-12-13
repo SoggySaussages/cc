@@ -13,11 +13,12 @@
         {{ $db = .Value }}
     {{ end }}
     {{ if not $db.Staff }}
-        {{ sendMessage nil "DEBUG: Staff check F" }}
+        {{ sendMessage .Channel.ID "DEBUG: Staff check F" }}
     {{ else }}
-        {{ sendMessage nil "DEBUG: Staff check T" }}
+        {{ sendMessage .Channel.ID "DEBUG: Staff check T" }}
     {{ end }}
-    {{ sendMessage nil ( cembed "description" "DEBUG" ) }}
+    {{ sendMessage .Channel.ID ( cembed "description" "DEBUG" ) }}
+    {{ return "DEBUG: Template executed" }}
 {{ end }}
 
 
@@ -45,7 +46,7 @@
     {{ $ = execTemplate "setCmdContext" $ }}
     {{ range $customCommands }}
         {{ if and ( eq .Type "Command" ) ( eq .Trigger $.Cmd ) }}
-            {{ return ( execTemplate .Template $ ) }}
+            {{ execTemplate .Template $ }}
         {{ end }}
     {{ end }}
 {{ end }}
