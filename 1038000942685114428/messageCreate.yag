@@ -1,3 +1,51 @@
+{{ $ := sdict . }}
 {{if not .User.ID}}
     {{return}}
 {{end}}
+
+{{ define "devtest" }}
+    {{ $db := sdict 
+        "OnServer" false
+        "Agreed" false
+        "Staff" false
+    }}
+    {{ with ( dbGet .User.ID "member" ) }}
+        {{ $db = .Value }}
+    {{ end }}
+    {{ if not $db.Staff }}
+        {{ sendMessage nil "DEBUG: Staff check F" }}
+    {{ else }}
+        {{ sendMessage nil "DEBUG: Staff check T" }}
+    {{ end }}
+    {{ sendMessage nil ( cembed "description" "DEBUG" ) }}
+{{ end }}
+
+
+
+{{ define "setCmdContext" }}
+    {{ $ := sdict . }}
+    {{ $.Set "Args" ( split .Message.Content " " ) }}
+    {{ $.Set "CmdArgs" ( slice $.Args 1 ) }}
+    {{ $.Set "StrippedMsg" ( joinStr " " $.CmdArgs ) }}
+    {{ $.Set "Cmd" ( slice ( index $.Args 0 ) ( len .ServerPrefix ) ) }}
+    {{ return $ }}
+{{ end }}
+
+{{ $customCommands := cslice }}
+
+{{ $customCommands = $customCommands.AppendSlice ( cslice
+    ( sdict
+        "Type" "Command"
+        "Trigger" "Devtest"
+        "Template" "devtest"
+    )
+) }}
+
+{{ if hasPrefix .Message.Content .ServerPrefix }}
+    {{ $ = execTemplate "setCmdContext" $ }}
+    {{ range $customCommands }}
+        {{ if and ( eq .Type "Command" ) ( eq .Trigger $.Cmd ) }}
+            {{ return ( execTemplate .Template $ ) }}
+        {{ end }}
+    {{ end }}
+{{ end }}
