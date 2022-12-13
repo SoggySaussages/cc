@@ -46,7 +46,9 @@
     {{ $ = execTemplate "setCmdContext" $ }}
     {{ range $customCommands }}
         {{ if and ( eq .Type "Command" ) ( eq .Trigger $.Cmd ) }}
-            {{ execTemplate .Template $ }}
+            {{ if eq .Template "devtest" }}
+                {{ execTemplate "devtest" $ }}
+            {{ end }}
         {{ end }}
     {{ end }}
 {{ end }}
