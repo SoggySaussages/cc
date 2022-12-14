@@ -277,7 +277,7 @@
         {{ end }}
         {{ sendMessage nil ( cembed $emb ) }}
     {{ else }}
-        {{ sendMessage nil ( printf "Couldn't find command `%s`"  ) }}
+        {{ execAdmin "help" .StrippedMsg }}
     {{ end }}
 {{ end }}
 
@@ -401,7 +401,7 @@
 
 {{ block "level" $ }}
     {{ with ( $db := dbGet .User.ID "levelling" ) }}
-        {{ if ( ( dbGet $.User.ID "xp" ).UpdatedAt.Before ( currentTime.Add ( mult $.TimeMinute -1 ) ) ) }}
+        {{ if ( ( dbGet $.User.ID "xp" ).UpdatedAt.Add $.Time.Minute ).After  }}
             {{ $xp := dbIncr $.User.ID "xp" ( randInt 10 15 ) | toInt }}
             {{ $rank := dbRank ( sdict "pattern" "xp" ) $.User.ID "xp" }}
             {{ if ge $xp ( .Levels.Get ( add 1 .LastLevel ) ) }}
