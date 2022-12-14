@@ -1,5 +1,4 @@
-{{sendMessage nil (print .User.String " was warned with reason: " .Reason)}}
-{{ dbSet 0 "mod-log" ( str 1051746604366962748 ) }}
+{{sendMessage nil (printf "**%s** was warned with reason `%s`" .User.String .Reason)}}
 {{ $db := ( sdict 
     "Warns" cslice
     "Mutes" cslice

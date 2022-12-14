@@ -1,4 +1,4 @@
-{{ dbSet 0 "mod-log" ( str 1051746604366962748 ) }}
+{{sendMessage nil (printf "**%s** was banned with reason `%s`" .User.String .Reason)}}
 {{ $db := or ( dbGet .User.ID "moderation" ).Value ( sdict 
     "Warns" cslice
     "Mutes" cslice
@@ -18,7 +18,7 @@
 {{ $msg.Set "Logs" ( printf "[Logs](%s)" ( execAdmin "logs" ) ) }}
 {{ range ( cslice "Warns" "Mutes" "Kicks" "Bans" ) }}
     {{ if ( $db.Get . ) }}
-        {{ $msg.Set "Stats" ( print ( $msg.Stats ) "%s: %d, " . ( len ( $db.Get . ) ) ) }}
+        {{ $msg.Set "Stats" ( print ( or $msg.Stats "" ) ( printf "%s: %d, " . ( len ( $db.Get . ) ) ) ) }}
     {{ end }}
 {{ end }}
 {{ $fields := cslice }}
@@ -33,7 +33,7 @@
     {{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
 {{ end }}
 {{ $fields = $fields.Append ( print "Logs: " $msg.Logs ) }}
-{{ sendMessage 1051746604366962748 (
+{{ sendMessage ( ( dbGet 0 "mod-log" ).Value | toInt ) (
     cembed
     "title" .Guild.Name
     "timestamp" currentTime
