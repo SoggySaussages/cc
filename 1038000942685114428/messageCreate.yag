@@ -23,6 +23,32 @@
     {{ return "DEBUG: Template executed" }}
 {{ end }}
 
+{{ define "registerstaff" }}
+    {{ $out := cslice }}
+    {{ range .CmdArgs }}
+        {{ try }}
+            {{ with userArg . }}
+                {{ $db := sdict
+                    "OnServer" false
+                    "Agreed" false
+                    "Staff" true
+                }}
+                {{ with dbGet .ID "member" }}
+                    {{ $db = . }}
+                {{ end }}
+                {{ $db.Set "Staff" .Register }}
+                {{ dbSet .ID "member" $db }}
+                {{ $reg := "Unregistered" }}
+                {{ if .Register }}
+                    {{ $reg = "Registered" }}
+                {{ end }}
+                {{ $out = $out.Append ( printf "%s **%s** as a staff member." $reg .String ) }}
+            {{ end }}
+        {{ catch }}
+            {{ $out = $out.Append ( printf "Failed to modify registration of **%s** as a staff member." . ) }}
+        {{ end }}
+    {{ end }}
+{{ end }}
 
 
 {{ define "setCmdContext" }}
@@ -39,11 +65,24 @@
 {{ $customCommands := cslice }}
 
 {{ $customCommands = $customCommands.AppendSlice ( cslice
-    ( sdict
-        "Type" "Command"
-        "Trigger" "Devtest"
-        "Template" "devtest"
-    )
+( sdict
+    "Type" "Command"
+    "Trigger" "Devtest"
+    "Aliases" cslice
+    "Template" "devtest"
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "RegisterStaff"
+    "Aliases" ( cslice "staff" "rstaff" "addstaff" )
+    "Template" "registerstaff"
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "UnregisterStaff"
+    "Aliases" ( cslice "urstaff" "removestaff" )
+    "Template" "unregisterstaff"
+)
 ) }}
 
 {{ if hasPrefix .Message.Content .ServerPrefix }}
@@ -52,11 +91,31 @@
     {{ range $customCommands }}
         {{/*"{{/*"DEBUG: Ranging command ```json"*/}}
         {{/*"{{ json . }}```"*/}}
-        {{ if and ( eq .Type "Command" ) ( eq ( lower .Trigger ) ( lower $.Cmd ) ) }}
+        {{ if and ( eq .Type "Command" ) }}
+            {{ $run := false }}
+            {{ if ( eq ( lower .Trigger ) ( lower $.Cmd ) ) }}
+                {{ $run = true }}
+            {{ else }}
+                {{ range .Aliases }}
+                    {{ if ( eq ( lower . ) ( lower $.Cmd ) ) }}
+                        {{ $run = true }}
+                        {{ break }}
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+            {{ if not $run }}
+                {{ continue }}
+            {{ end }}
             {{/*"DEBUG: Command matched"*/}}
             {{ if eq .Template "devtest" }}
                 DEBUG: Execution start
                 {{ execTemplate "devtest" $ }}
+            {{ else if eq .Template "registerstaff" }}
+                {{ $.Set "Register" true }}
+                {{ execTemplate "registerstaff" $ }}
+            {{ else if eq .Template "unregisterstaff" }}
+                {{ $.Set "Register" false }}
+                {{ execTemplate "registerstaff" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
