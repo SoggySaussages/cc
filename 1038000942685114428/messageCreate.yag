@@ -224,16 +224,19 @@
 {{ end }}
 
 {{ define "help" }}
-    {{ if not .CmdArgs }}
+    {{ $find := "" }}
+    {{ with .CmdArgs }}
+        {{ $find = index . 0 }}
+    {{ else }}
         {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [Command]`" .ServerPrefix .Cmd ) }}
     {{ end }}
     {{ $match := false }}
-    {{ range $c := $customCommands }}
-        {{ if ( eq ( lower $c.Trigger ) ( lower $.Cmd ) ) }}
+    {{ range $c := .Commands }}
+        {{ if ( eq ( lower $c.Trigger ) ( lower $find ) ) }}
             {{ $match = $c }}
         {{ else }}
             {{ range $c.Aliases }}
-                {{ if ( eq ( lower . ) ( lower $.Cmd ) ) }}
+                {{ if ( eq ( lower . ) ( lower $find ) ) }}
                     {{ $match = $c }}
                     {{ break }}
                 {{ end }}
@@ -273,7 +276,7 @@
         {{ end }}
         {{ sendMessage nil ( cembed $emb ) }}
     {{ else }}
-        {{ sendMessage nil "Could not find that command" }}
+        {{ sendMessage nil ( printf "Couldn't find command `%s`"  ) }}
     {{ end }}
 {{ end }}
 
@@ -386,6 +389,7 @@
             {{ else if eq .Template "json" }}
                 {{ template "json" $ }}
             {{ else if eq .Template "help" }}
+                {{ $.Set "Commands" $customCommands }}
                 {{ template "help" $ }}
             {{ end }}
         {{ end }}
@@ -396,7 +400,7 @@
 
 {{ block "level" $ }}
     {{ with ( $db := dbGet .User.ID "levelling" ) }}
-        {{ if ( ( dbGet $.User.ID "xp" ).UpdatedAt.Before ( currentTime.Sub $.TimeMinute ) ) }}
+        {{ if ( ( dbGet $.User.ID "xp" ).UpdatedAt.Before ( currentTime.Add ( mult $.TimeMinute -1 ) ) ) }}
             {{ $xp := dbIncr $.User.ID "xp" ( randInt 10 15 ) | toInt }}
             {{ $rank := dbRank ( sdict "pattern" "xp" ) $.User.ID "xp" }}
             {{ if ge $xp ( .Levels.Get ( add 1 .LastLevel ) ) }}
