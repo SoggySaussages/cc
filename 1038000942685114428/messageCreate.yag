@@ -228,7 +228,11 @@
     {{ with .CmdArgs }}
         {{ $find = index . 0 }}
     {{ else }}
-        {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [Command]`" .ServerPrefix .Cmd ) }}
+        {{ $out := cslice "No command provided, listing available:" }}
+        {{ range .Commands }}
+            {{ $out = $out.Append ( printf "`%s` - %s" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) ) .Description ) }}
+        {{ end }}
+        {{ sendMessage nil $out }}
         {{ return }}
     {{ end }}
     {{ $match := false }}
@@ -344,7 +348,7 @@
     "Trigger" "Help"
     "Aliases" ( cslice "h" )
     "Template" "help"
-    "Args" ( cslice ( sdict "Optional" false "Type" "string" "Name" "Command" ) )
+    "Args" ( cslice ( sdict "Optional" true "Type" "string" "Name" "Command" ) )
     "Description" "Returns help info for the provided command"
 )
 ) }}
