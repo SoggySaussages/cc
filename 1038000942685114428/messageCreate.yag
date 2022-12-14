@@ -26,7 +26,7 @@
         {{ sendMessage nil "You don't have permission to use that command!" }}
         {{ return }}
     {{ end }}
-    {{ if eq ( len .CmdArgs ) 0 }}
+    {{ if not .CmdArgs }}
         {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [User] ...` (Multiple selections available)" .ServerPrefix .Cmd ) }}
     {{ end }}
     {{ $out := cslice }}
