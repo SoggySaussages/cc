@@ -210,7 +210,7 @@
     )
     ( sdict
         "name" ( printf "%d%% of the way!" )
-        "value" $bar
+        "value" ( joinStr "" $bar )
     )
     )
     "color" ( randInt 0xFFFFFF )
