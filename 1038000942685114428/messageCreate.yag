@@ -177,8 +177,8 @@
     {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel | toInt }}
     {{ $progress := ( add $xp ( mult -1 ( .Levels.Get $level ) ) ) }}
     {{ $required := ( .Levels.Get ( add $level 1 ) ) }}
-    {{ $progressPercent := fdiv $progress $required | mult 100 | round }}
-    {{ $progressTens := fdiv $progressPercent 10 | round }}
+    {{ $progressPercent := fdiv $progress $required | mult 100 | round | toInt }}
+    {{ $progressTens := fdiv $progressPercent 10 | round | toInt }}
     {{ $diff := sub $required $xp }}
     {{ $diffPercent := sub 10 $progressTens }}
     {{ $bar := cslice }}
