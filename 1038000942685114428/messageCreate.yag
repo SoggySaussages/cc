@@ -128,10 +128,6 @@
 {{ end }}
 
 {{ define "registerstaff" }}
-    {{ if not ( hasPermissions .Permissions.Administrator ) }}
-        {{ sendMessage nil "You don't have permission to use that command!" }}
-        {{ return }}
-    {{ end }}
     {{ if not .CmdArgs }}
         {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [User] ...` (Multiple selections available)" .ServerPrefix .Cmd ) }}
     {{ end }}
@@ -227,6 +223,60 @@
     {{ sendMessage nil ( complexMessage ( jsonToSdict $msg ) ) }}
 {{ end }}
 
+{{ define "help" }}
+    {{ if not .CmdArgs }}
+        {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [Command]`" .ServerPrefix .Cmd ) }}
+    {{ end }}
+    {{ $match := false }}
+    {{ range $c := $customCommands }}
+        {{ if ( eq ( lower $c.Trigger ) ( lower $.Cmd ) ) }}
+            {{ $match = $c }}
+        {{ else }}
+            {{ range $c.Aliases }}
+                {{ if ( eq ( lower . ) ( lower $.Cmd ) ) }}
+                    {{ $match = $c }}
+                    {{ break }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+        {{ if $match }}
+            {{ break }}
+        {{ end }}
+    {{ end }}
+    {{ with $match }}
+        {{ $args := cslice }}
+        {{ range .Args }}
+            {{ $cur := cslice }}
+            {{ if .Optional }}
+                {{ $cur = $cur.Append "[" }}
+            {{ else }}
+                {{ $cur = $cur.Append "<" }}
+            {{ end }}
+            {{ $cur = $cur.Append ( printf "%s:%s" .Name .Type ) }}
+            {{ if .Optional }}
+                {{ $cur = $cur.Append "]" }}
+            {{ else }}
+                {{ $cur = $cur.Append ">" }}
+            {{ end }}
+            {{ $args = $args.Append ( joinStr "" $cur ) }}
+        {{ end }}
+        {{ $emb := sdict 
+        "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
+        "description" ( print
+"```"
+( joinStr " " ( ( cslice .Trigger ).AppendSlice $args ) )
+"```\n"
+.Description
+        )}}
+        {{ with .RequiredPerms }}
+            {{ $emb.Set "footer" ( sdict "text" .Readable ) }}
+        {{ end }}
+        {{ sendMessage nil ( cembed $emb ) }}
+    {{ else }}
+        {{ sendMessage nil "Could not find that command" }}
+    {{ end }}
+{{ end }}
+
 
 {{ define "setCmdContext" }}
     {{ $ := sdict . }}
@@ -247,30 +297,51 @@
     "Trigger" "Devtest"
     "Aliases" cslice
     "Template" "devtest"
+    "Args" ( cslice )
+    "Description" "A command restricted to staff, its function varies"
 )
 ( sdict
     "Type" "Command"
     "Trigger" "RegisterStaff"
     "Aliases" ( cslice "staff" "rstaff" "addstaff" )
     "Template" "registerstaff"
+    "Args" ( cslice ( sdict "Optional" false "Type" "user" "Name" "Members to register" ) )
+    "Description" "Registers a member to the staff team, granting access to certain commands"
+    "RequiredPerms" ( sdict "Readable" "Administrator" "Bitwise" .Permissions.Administrator )
 )
 ( sdict
     "Type" "Command"
     "Trigger" "UnregisterStaff"
     "Aliases" ( cslice "urstaff" "removestaff" )
     "Template" "unregisterstaff"
+    "Args" ( cslice ( sdict "Optional" false "Type" "user" "Name" "Members to register" ) )
+    "Description" "Unregisters a member from the staff team, removing their access to certain commands"
+    "RequiredPerms" ( sdict "Readable" "Administrator" "Bitwise" .Permissions.Administrator )
 )
 ( sdict
     "Type" "Command"
     "Trigger" "Rank"
     "Aliases" ( cslice "level" )
     "Template" "rank"
+    "Args" ( cslice ( sdict "Optional" true "Type" "user" "Name" "Member to rank" ) )
+    "Description" "Get the rank of you or the target member"
 )
 ( sdict
     "Type" "Command"
     "Trigger" "Json"
     "Aliases" cslice
     "Template" "json"
+    "Args" ( cslice ( sdict "Optional" false "Type" "string" "Name" "JSON to send" ) )
+    "Description" "Converts provided JSON payload to a message, and sends it"
+    "RequiredPerms" ( sdict "Readable" "Manage Messages" "Bitwise" .Permissions.ManageMessages )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "Help"
+    "Aliases" ( cslice "h" )
+    "Template" "help"
+    "Args" ( cslice ( sdict "Optional" false "Type" "string" "Name" "Command" ) )
+    "Description" "Returns help info for the provided command"
 )
 ) }}
 
@@ -296,6 +367,12 @@
                 {{ continue }}
             {{ end }}
             {{/*"DEBUG: Command matched"*/}}
+            {{ with .RequiredPerms }}
+                {{ if not ( hasPermissions .Bitwise ) }}
+                    {{ sendMessage nil "You don't have permission to use that command!" }}
+                    {{ continue }}
+                {{ end }}
+            {{ end }}
             {{ if eq .Template "devtest" }}
                 {{ template "devtest" $ }}
             {{ else if eq .Template "registerstaff" }}
@@ -308,6 +385,8 @@
                 {{ template "rank" $ }}
             {{ else if eq .Template "json" }}
                 {{ template "json" $ }}
+            {{ else if eq .Template "help" }}
+                {{ template "help" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
