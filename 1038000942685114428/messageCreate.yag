@@ -229,6 +229,7 @@
         {{ $find = index . 0 }}
     {{ else }}
         {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [Command]`" .ServerPrefix .Cmd ) }}
+        {{ return }}
     {{ end }}
     {{ $match := false }}
     {{ range $c := .Commands }}
