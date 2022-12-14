@@ -194,7 +194,7 @@
     "description" ( printf "They have **%d** total XP" )
     "fields" ( cslice
     ( sdict
-        "name" $level
+        "name" ( str $level )
         "value" ( printf "Current level\n%d XP" ( .Levels.Get $level ) )
         "inline" true
     )
@@ -204,7 +204,7 @@
         "inline" true
     )
     ( sdict
-        "name" ( add $level 1 )
+        "name" ( add $level 1 | str )
         "value" ( printf "Next level\n%d XP" $required )
         "inline" true
     )
@@ -408,21 +408,21 @@
         {{ if ( ( ( dbGet $.User.ID "xp" ).UpdatedAt.Add $.TimeMinute ).Before currentTime ) }}
             {{ $xp := dbIncr $.User.ID "xp" ( randInt 10 15 ) | toInt }}
             {{ $rank := dbRank ( sdict "pattern" "xp" ) $.User.ID "xp" }}
-            {{ if ge $xp ( .Levels.Get ( add 1 .LastLevel ) ) }}
+            {{ if ge $xp ( $.Levels.Get ( add 1 .Value.LastLevel ) ) }}
                 {{ sendMessage nil ( cembed
-                    "title" ( printf "%s just reached level %d!" ( or $.Member.Nick $.User.Username ) ( add .LastLevel 1 ) )
-                    "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) )
+                    "title" ( printf "%s just reached level %d!" ( or $.Member.Nick $.User.Username ) ( add .Value.LastLevel 1 ) )
+                    "thumbnail" ( sdict "url" ( $.User.AvatarURL "1024" ) )
                     "description" ( printf "They are #%d in %s with %d XP" $rank $.Guild.Name $xp )
                     "color" ( randInt 0xFFFFFF )
                 ) }}
                 {{ $db.Set "LastLevel" ( add $db.LastLevel 1 ) }}
-                {{ dbSet .User.ID "levelling" $db }}
+                {{ dbSet $.User.ID "levelling" $db }}
             {{ end }}
         {{ end }}
     {{ else }}
-        {{ dbSet .User.ID "levelling" ( sdict
+        {{ dbSet $.User.ID "levelling" ( sdict
             "LastLevel" 0
         ) }}
-        {{ $silent := dbIncr .User.ID "xp" 10 }}
+        {{ $silent := dbIncr $.User.ID "xp" 10 }}
     {{ end }}
 {{ end }}
