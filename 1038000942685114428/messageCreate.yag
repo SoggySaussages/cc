@@ -150,7 +150,7 @@
                 {{ $db.Set "Staff" $.Register }}
                 {{ dbSet .ID "member" $db }}
                 {{ $reg := "Unregistered" }}
-                {{ if .Register }}
+                {{ if $.Register }}
                     {{ $reg = "Registered" }}
                 {{ end }}
                 {{ $out = $out.Append ( printf "%s **%s** as a staff member." $reg .String ) }}
