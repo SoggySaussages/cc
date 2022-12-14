@@ -129,7 +129,7 @@
         {{ dbSet .User.ID "levelling" ( sdict
             "LastLevel" 0
         ) }}
-        {{ dbIncr .User.ID 10 }}
+        {{ dbIncr .User.ID "xp" 10 }}
     {{ end }}
 {{ end }}
 
