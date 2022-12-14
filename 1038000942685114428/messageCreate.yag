@@ -186,10 +186,10 @@
     {{ $diff := sub $required $xp }}
     {{ $diffPercent := sub 10 $progressTens }}
     {{ $bar := cslice }}
-    {{ range ( seq $progressTens ) }}
+    {{ range ( seq 0 $progressTens ) }}
         {{ $bar = $bar.Append "🟩" }}
     {{ end }}
-    {{ range ( seq $diffPercent ) }}
+    {{ range ( seq 0 $diffPercent ) }}
         {{ $bar = $bar.Append "⬜" }}
     {{ end }}
     {{ sendMessage nil ( cembed
