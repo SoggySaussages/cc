@@ -51,7 +51,7 @@
     {{ range $customCommands }}
         DEBUG: Ranging command ```json
         {{ json . }}```
-        {{ if and ( eq .Type "Command" ) ( eq .Trigger $.Cmd ) }}
+        {{ if and ( eq .Type "Command" ) ( eq ( toLower .Trigger ) ( toLower $.Cmd ) ) }}
             DEBUG: Command matched
             {{ if eq .Template "devtest" }}
                 DEBUG: Execution start
