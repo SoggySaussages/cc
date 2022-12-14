@@ -27,8 +27,10 @@
 {{ define "setCmdContext" }}
     {{ $ := sdict . }}
     {{ $.Set "Args" ( split .Message.Content " " ) }}
-    {{ $.Set "CmdArgs" ( slice $.Args 1 ) }}
-    {{ $.Set "StrippedMsg" ( joinStr " " $.CmdArgs ) }}
+    {{ if gt ( len $.Args ) 1 }}
+        {{ $.Set "CmdArgs" ( slice $.Args 1 ) }}
+        {{ $.Set "StrippedMsg" ( joinStr " " $.CmdArgs ) }}
+    {{ end }}
     {{ $.Set "Cmd" ( slice ( index $.Args 0 ) ( len .ServerPrefix ) ) }}
     {{ return $ }}
 {{ end }}
