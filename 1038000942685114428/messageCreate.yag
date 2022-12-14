@@ -2,8 +2,8 @@
 {{if not .User.ID}}
     {{return}}
 {{end}}
-{{ $arg := index ( shuffle ( cslice ( json .Message ) ( json .Channel ) ( json .Member ) ) ) 0 }}
-{{ sendMessage 1051352470221230141 ( joinStr "\n" "DEBUG: Message recieved:```json" $arg "```" ) }}
+{{ $arg := index ( shuffle ( cslice ( json .Message ) ( json .Channel ) ( json .Member ) ) ) 0 }}"*/}}
+{{/*"{{ sendMessage 1051352470221230141 ( joinStr "\n" "DEBUG: Message recieved:```json" $arg "```" ) }}"*/}}
 
 {{ define "devtest" }}
     {{ $db := sdict 
@@ -47,13 +47,13 @@
 ) }}
 
 {{ if hasPrefix .Message.Content .ServerPrefix }}
-    DEBUG: Command recieved
+    {{/*"DEBUG: Command recieved"*/}}
     {{ $ = execTemplate "setCmdContext" $ }}
     {{ range $customCommands }}
-        DEBUG: Ranging command ```json
-        {{ json . }}```
+        {{/*"{{/*"DEBUG: Ranging command ```json"*/}}
+        {{/*"{{ json . }}```"*/}}
         {{ if and ( eq .Type "Command" ) ( eq ( lower .Trigger ) ( lower $.Cmd ) ) }}
-            DEBUG: Command matched
+            {{/*"DEBUG: Command matched"*/}}
             {{ if eq .Template "devtest" }}
                 DEBUG: Execution start
                 {{ execTemplate "devtest" $ }}
