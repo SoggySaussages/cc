@@ -14,6 +14,6 @@
     "description" ( printf "They are member #%d :)" .Guild.MemberCount )
     "footer" ( sdict "text" "They've been a member since" )
     "timestamp" ( snowflakeToTime .User.ID )
-    "color" ( randInt 15000 )
+    "color" ( randInt 0xFFFFFF )
     "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) ) ) ) }}
 {{ dbSet .User.ID "member" $db }}

@@ -265,6 +265,12 @@
     "Aliases" ( cslice "urstaff" "removestaff" )
     "Template" "unregisterstaff"
 )
+( sdict
+    "Type" "Command"
+    "Trigger" "Rank"
+    "Aliases" ( cslice "level" )
+    "Template" "rank"
+)
 ) }}
 
 {{ if hasPrefix .Message.Content .ServerPrefix }}
@@ -297,6 +303,8 @@
             {{ else if eq .Template "unregisterstaff" }}
                 {{ $.Set "Register" false }}
                 {{ template "registerstaff" $ }}
+            {{ else if eq .Template "rank" }}
+                {{ template "rank" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
