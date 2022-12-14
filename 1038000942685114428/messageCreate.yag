@@ -221,6 +221,12 @@
 ) }}
 {{ end }}
 
+{{ define "json" }}
+    {{ $msg := reReplace `"embeds"` .StrippedMsg `"embed"` }}
+    {{ $msg = reReplace `,\n\s*"attachments":\s*\[\]` $msg "" }}
+    {{ sendMessage nil ( complexMessage ( jsonToSdict $msg ) ) }}
+{{ end }}
+
 
 {{ define "setCmdContext" }}
     {{ $ := sdict . }}
@@ -260,6 +266,12 @@
     "Aliases" ( cslice "level" )
     "Template" "rank"
 )
+( sdict
+    "Type" "Command"
+    "Trigger" "Json"
+    "Aliases" cslice
+    "Template" "json"
+)
 ) }}
 
 {{ if hasPrefix .Message.Content .ServerPrefix }}
@@ -294,6 +306,8 @@
                 {{ template "registerstaff" $ }}
             {{ else if eq .Template "rank" }}
                 {{ template "rank" $ }}
+            {{ else if eq .Template "json" }}
+                {{ template "json" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
