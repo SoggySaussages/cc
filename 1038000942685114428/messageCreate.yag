@@ -41,13 +41,15 @@
                 {{ with dbGet .ID "member" }}
                     {{ $db = . }}
                 {{ end }}
-                {{ $db.Set "Staff" .Register }}
+                {{ $db.Set "Staff" $.Register }}
                 {{ dbSet .ID "member" $db }}
                 {{ $reg := "Unregistered" }}
                 {{ if .Register }}
                     {{ $reg = "Registered" }}
                 {{ end }}
                 {{ $out = $out.Append ( printf "%s **%s** as a staff member." $reg .String ) }}
+            {{ else }}
+                {{ $out = $out.Append ( printf "Failed to modify registration of **%s** as a staff member." . ) }}
             {{ end }}
         {{ catch }}
             {{ $out = $out.Append ( printf "Failed to modify registration of **%s** as a staff member." . ) }}
