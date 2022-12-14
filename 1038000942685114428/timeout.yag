@@ -26,7 +26,7 @@
 {{ $fields = $fields.Append ( print "Where: " $msg.Channel ) }}
 {{ $fields = $fields.Append ( print "Action: " "Muted" ) }}
 {{ $fields = $fields.Append ( print "Moderator: " $msg.Moderator ) }}
-{{ $fields = $fields.Append ( print "Until: <t:" $db.Until.Unix ":F>" ) }}
+{{ $fields = $fields.Append ( print "Until: <t:" ( currentTime.Add .Duration ).Unix ":F>" ) }}
 {{ if ne .Reason "(No reason specified)" }}
     {{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
 {{ end }}
