@@ -38,5 +38,8 @@
     "timestamp" currentTime
     "footer" ( sdict "text" $msg.Stats )
     "description" ( joinStr "\n" $fields )
+    "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) )
+    "author" ( sdict "icon_url" "https://cdn.discordapp.com/emojis/1052516040438984724.webp?size=240&quality=lossless" "name" "Warned" )
+    "color" 16547631
 ) }}
 {{ dbSet .User.ID "moderation" $db }}

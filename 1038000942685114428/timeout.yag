@@ -9,7 +9,7 @@
     "User" .User.ID
     "Reason" .Reason
     "Author" .Author.ID
-    "Until" ( currentTime.Add ( toDuration .Duration ) )
+    "Until" ( currentTime.Add .Duration )
 ) ) }}
 {{ $msg := sdict }}
 {{ $msg.Set "User" ( printf "%s `%s`" .User.Mention .User ) }}
@@ -26,7 +26,7 @@
 {{ $fields = $fields.Append ( print "Where: " $msg.Channel ) }}
 {{ $fields = $fields.Append ( print "Action: " "Muted" ) }}
 {{ $fields = $fields.Append ( print "Moderator: " $msg.Moderator ) }}
-{{ $fields = $fields.Append ( print "Until: <t:" $db.Until ":F>" ) }}
+{{ $fields = $fields.Append ( print "Until: <t:" $db.Until.Unix ":F>" ) }}
 {{ if ne .Reason "(No reason specified)" }}
     {{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
 {{ end }}
@@ -37,5 +37,8 @@
     "timestamp" currentTime
     "footer" ( sdict "text" $msg.Stats )
     "description" ( joinStr "\n" $fields )
+    "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) )
+    "author" ( sdict "icon_url" "https://cdn.discordapp.com/emojis/1052516038945812531.webp?size=240&quality=lossless" "name" "Timed out" )
+    "color" 15909610
 ) }}
 {{ dbSet .User.ID "moderation" $db }}

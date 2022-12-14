@@ -9,7 +9,7 @@
     "User" .User.ID
     "Reason" .Reason
     "Author" .Author.ID
-    "Until" ( currentTime.Add ( toDuration .Duration ) ) 
+    "Until" ( currentTime.Add .Duration ) 
 ) ) }}
 {{ $msg := sdict }}
 {{ $msg.Set "User" ( printf "%s `%s`" .User.Mention .User ) }}
@@ -27,7 +27,7 @@
 {{ $fields = $fields.Append ( print "Action: " "Banned" ) }}
 {{ $fields = $fields.Append ( print "Moderator: " $msg.Moderator ) }}
 {{ if .Duration }}
-    {{ $fields = $fields.Append ( print "Until: <t:" $db.Until ":F>" ) }}
+    {{ $fields = $fields.Append ( print "Until: <t:" $db.Until.Unix ":F>" ) }}
 {{ end }}
 {{ if ne .Reason "(No reason specified)" }}
     {{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
@@ -39,5 +39,8 @@
     "timestamp" currentTime
     "footer" ( sdict "text" $msg.Stats )
     "description" ( joinStr "\n" $fields )
+    "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) )
+    "author" ( sdict "icon_url" "https://cdn.discordapp.com/emojis/1052516036257251368.webp?size=240&quality=lossless" "name" "Banned" )
+    "color" 15932573
 ) }}
 {{ dbSet .User.ID "moderation" $db }}
