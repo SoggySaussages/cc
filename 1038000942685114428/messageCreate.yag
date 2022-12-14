@@ -176,11 +176,11 @@
         {{ dbSet $user.ID "levelling" ( sdict
             "LastLevel" 0
         ) }}
-        {{ $silent := dbIncr .User.ID "xp" 10 }}
+        {{ $xp = dbIncr .User.ID "xp" 10 }}
     {{ end }}
     {{ $rank := dbRank ( sdict "pattern" "xp" ) $.user.ID "xp" }}
     {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel | toInt }}
-    {{ $progress := ( add $xp ( mult -1 ( .Levels.Get $level ) ) ) }}
+    {{ $progress := ( sub $xp ( .Levels.Get $level ) ) }}
     {{ $required := ( .Levels.Get ( add $level 1 ) ) }}
     {{ $progressPercent := fdiv $progress $required | mult 100 | round | toInt }}
     {{ $progressTens := fdiv $progressPercent 10 | round | toInt }}
@@ -200,7 +200,7 @@
     "fields" ( cslice
     ( sdict
         "name" ( str $level )
-        "value" ( printf "Current level\n%d XP" ( .Levels.Get $level ) )
+        "value" ( printf "Current level\n%d XP" ( sub $progress ( .Levels.Get $level ) ) )
         "inline" true
     )
     ( sdict
@@ -210,7 +210,7 @@
     )
     ( sdict
         "name" ( add $level 1 | str )
-        "value" ( printf "Next level\n%d XP" $required )
+        "value" ( printf "Next level\n%d XP" ( sub $required ( .Levels.Get $level ) ) )
         "inline" true
     )
     ( sdict
@@ -409,18 +409,18 @@
 
 
 {{ block "level" $ }}
-    {{ with ( $db := dbGet .User.ID "levelling" ) }}
+    {{ with ( $db := ( dbGet .User.ID "levelling" ).Value ) }}
         {{ if ( ( ( dbGet $.User.ID "xp" ).UpdatedAt.Add $.TimeMinute ).Before currentTime ) }}
             {{ $xp := dbIncr $.User.ID "xp" ( randInt 10 15 ) | toInt }}
             {{ $rank := dbRank ( sdict "pattern" "xp" ) $.User.ID "xp" }}
-            {{ if ge $xp ( $.Levels.Get ( add 1 .Value.LastLevel ) ) }}
+            {{ if ge $xp ( $.Levels.Get ( add 1 .LastLevel ) ) }}
                 {{ sendMessage nil ( cembed
-                    "title" ( printf "%s just reached level %d!" ( or $.Member.Nick $.User.Username ) ( add .Value.LastLevel 1 ) )
+                    "title" ( printf "%s just reached level %d!" ( or $.Member.Nick $.User.Username ) ( add .LastLevel 1 ) )
                     "thumbnail" ( sdict "url" ( $.User.AvatarURL "1024" ) )
                     "description" ( printf "They are #%d in %s with %d XP" $rank $.Guild.Name $xp )
                     "color" ( randInt 0xFFFFFF )
                 ) }}
-                {{ $db.Set "LastLevel" ( add $db.LastLevel 1 ) }}
+                {{ $db.Set "LastLevel" ( add .LastLevel 1 ) }}
                 {{ dbSet $.User.ID "levelling" $db }}
             {{ end }}
         {{ end }}
