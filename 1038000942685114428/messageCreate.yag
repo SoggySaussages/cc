@@ -180,10 +180,10 @@
     {{ end }}
     {{ $rank := dbRank ( sdict "pattern" "xp" ) $.user.ID "xp" }}
     {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel | toInt }}
-    {{ $progress := ( sub $xp ( .Levels.Get $level ) ) }}
-    {{ $required := ( .Levels.Get ( add $level 1 ) ) }}
-    {{ $progressPercent := div ( mult 100 $progress ) ( mult  100 $required ) | round | toInt }}
-    {{ $progressTens := fdiv $progressPercent 10 | round | toInt }}
+    {{ $progress := ( sub $xp ( $.Levels.Get $level ) ) }}
+    {{ $required := ( $.Levels.Get ( add $level 1 ) ) }}
+    {{ $progressPercent := mult ( fdiv ( sub $progress ( $.Levels.Get $level ) ) ( sub $required ( $.Levels.Get $level ) ) ) 100 | toInt }}
+    {{ $progressTens := div $progressPercent 10 | toInt }}
     {{ $diff := sub $required $xp }}
     {{ $diffPercent := sub 10 $progressTens }}
     {{ $bar := cslice }}
@@ -200,7 +200,7 @@
     "fields" ( cslice
     ( sdict
         "name" ( str $level )
-        "value" ( printf "Current level\n%d XP" ( sub $progress ( .Levels.Get $level ) ) )
+        "value" ( printf "Current level\n%d XP" ( sub $progress ( $.Levels.Get $level ) ) )
         "inline" true
     )
     ( sdict
@@ -210,7 +210,7 @@
     )
     ( sdict
         "name" ( add $level 1 | str )
-        "value" ( printf "Next level\n%d XP" ( sub $required ( .Levels.Get $level ) ) )
+        "value" ( printf "Next level\n%d XP" ( sub $required ( $.Levels.Get $level ) ) )
         "inline" true
     )
     ( sdict
