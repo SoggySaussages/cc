@@ -26,6 +26,9 @@
         {{ sendMessage nil "You don't have permission to use that command!" }}
         {{ return }}
     {{ end }}
+    {{ if eq ( len .CmdArgs ) 0 }}
+        {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [User] ...` (Multiple selections available)" .ServerPrefix .Cmd ) }}
+    {{ end }}
     {{ $out := cslice }}
     {{ range .CmdArgs }}
         {{ try }}
@@ -110,14 +113,13 @@
             {{ end }}
             {{/*"DEBUG: Command matched"*/}}
             {{ if eq .Template "devtest" }}
-                DEBUG: Execution start
-                {{ execTemplate "devtest" $ }}
+                {{ template "devtest" $ }}
             {{ else if eq .Template "registerstaff" }}
                 {{ $.Set "Register" true }}
-                {{ execTemplate "registerstaff" $ }}
+                {{ template "registerstaff" $ }}
             {{ else if eq .Template "unregisterstaff" }}
                 {{ $.Set "Register" false }}
-                {{ execTemplate "registerstaff" $ }}
+                {{ template "registerstaff" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
