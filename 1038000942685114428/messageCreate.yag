@@ -29,8 +29,8 @@
         {{ try }}
             {{ with userArg . }}
                 {{ $db := sdict
-                    "OnServer" false
-                    "Agreed" false
+                    "OnServer" true
+                    "Agreed" true
                     "Staff" true
                 }}
                 {{ with dbGet .ID "member" }}
