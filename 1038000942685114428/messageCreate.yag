@@ -5,7 +5,7 @@
 {{/*"{{ $arg := index ( shuffle ( cslice ( json .Message ) ( json .Channel ) ( json .Member ) ) ) 0 }}"*/}}
 {{/*"{{ sendMessage 1051352470221230141 ( joinStr "\n" "DEBUG: Message recieved:```json" $arg "```" ) }}"*/}}
 
-{{ $.Levels := ( dict
+{{ $.Set "Levels" := ( dict
 0 0
 1 100
 2 255
