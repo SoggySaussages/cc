@@ -232,7 +232,7 @@
         {{ range .Commands }}
             {{ $out = $out.Append ( printf "`%s` - %s" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) ) .Description ) }}
         {{ end }}
-        {{ sendMessage nil $out }}
+        {{ sendMessage nil ( joinStr "\n" $out ) }}
         {{ return }}
     {{ end }}
     {{ $match := false }}
