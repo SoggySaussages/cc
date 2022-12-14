@@ -2,7 +2,7 @@
 {{if not .User.ID}}
     {{return}}
 {{end}}
-{{ sendMessage 1051352470221230141 ( joinStr "\n" "DEBUG: Message recieved:```json" {{ json .Message }} {{ json .Channel }} {{ json .Member }} "```" }}
+{{ sendMessage 1051352470221230141 ( joinStr "\n" "DEBUG: Message recieved:```json" {{ json .Message }} {{ json .Channel }} {{ json .Member }} "```" ) }}
 
 {{ define "devtest" }}
     {{ $db := sdict 

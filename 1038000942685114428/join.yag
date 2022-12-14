@@ -9,10 +9,11 @@
 {{$icon := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
 {{ sendMessage .Channel.ID ( complexMessage "embed" (
     cembed
-    "title" ( printf "%s just joined!" .User .Guild.Name )
+    "title" ( printf "%s just joined!" .User )
     "author" ( sdict "icon_url" $icon "name" .Guild.Name )
     "description" ( printf "They are member #%d :)" .Guild.MemberCount )
     "footer" ( sdict "text" "They've been a member since" )
     "timestamp" ( snowflakeToTime .User.ID )
-    "color" ( randInt 15000 ) ) ) }}
+    "color" ( randInt 15000 )
+    "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) ) ) ) }}
 {{ dbSet .User.ID "member" $db }}
