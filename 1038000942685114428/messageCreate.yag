@@ -187,16 +187,6 @@
     {{ $diff := sub $required $xp }}
     {{ $diffPercent := sub 10 $progressTens }}
     {{ $bar := cslice }}
-    ```json
-    {{$rank}}
-    {{$level}}
-    {{$progress}}
-    {{$required}}
-    {{$progressPercent}}
-    {{$progressTens}}
-    {{$diff}}
-    {{$diffPercent}}
-    ```
     {{ range ( seq 0 $progressTens ) }}
         {{ $bar = $bar.Append "🟩" }}
     {{ end }}
@@ -210,7 +200,7 @@
     "fields" ( cslice
     ( sdict
         "name" ( str $level )
-        "value" ( printf "Current level\n%d XP" ( sub $progress ( $.Levels.Get $level ) ) )
+        "value" ( printf "Current level\n%d XP" $progress )
         "inline" true
     )
     ( sdict
