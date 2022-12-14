@@ -145,7 +145,7 @@
                     "Staff" true
                 }}
                 {{ with dbGet .ID "member" }}
-                    {{ $db = . }}
+                    {{ $db = .Value }}
                 {{ end }}
                 {{ $db.Set "Staff" $.Register }}
                 {{ dbSet .ID "member" $db }}
