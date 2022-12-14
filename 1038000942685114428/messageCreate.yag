@@ -277,7 +277,7 @@
         {{ end }}
         {{ sendMessage nil ( cembed $emb ) }}
     {{ else }}
-        {{ execAdmin "help" .StrippedMsg }}
+        {{ sendMessage nil ( execAdmin "help" .StrippedMsg ) }}
     {{ end }}
 {{ end }}
 
