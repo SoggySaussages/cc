@@ -164,10 +164,21 @@
 {{ end }}
 
 {{ define "rank" }}
-    {{ $user := or ( index .CmdArgs 0 | userArg ) .User }}
-    {{ $xp := ( dbGet $user.ID "xp" ).Value | toInt }}
+    {{ $user := .User }}
+    {{ range .CmdArgs }}
+        {{ $user = . | userArg }}
+    {{ end }}
+    {{ $xp := 0 }}
+    {{ with ( dbGet $user.ID "xp" ) }}
+        {{ $xp = .Value | toInt }}
+    {{ else }}
+        {{ dbSet .User.ID "levelling" ( sdict
+            "LastLevel" 0
+        ) }}
+        {{ $silent := dbIncr .User.ID "xp" 10 }}
+    {{ end }}
     {{ $rank := dbRank ( sdict "pattern" "xp" ) $.user.ID "xp" }}
-    {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel }}
+    {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel | toInt }}
     {{ $progress := ( add $xp ( mult -1 ( .Levels.Get $level ) ) ) }}
     {{ $required := ( .Levels.Get ( add $level 1 ) ) }}
     {{ $progressPercent := fdiv $progress $required | mult 100 | round }}
@@ -310,6 +321,6 @@
         {{ dbSet .User.ID "levelling" ( sdict
             "LastLevel" 0
         ) }}
-        {{ dbIncr .User.ID "xp" 10 }}
+        {{ $silent := dbIncr .User.ID "xp" 10 }}
     {{ end }}
 {{ end }}
