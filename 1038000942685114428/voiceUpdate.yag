@@ -1,1 +1,1 @@
-{{ sendMessage 1051352470221230141 ( printf "DEBUG:\n```json\n%s```" ( json .VoiceState ) ) }}
+{{ sendMessage 1051352470221230141 ( complexMessage "file" ( printf "DEBUG:\n%s" ( json .VoiceState ) ) ) }}
