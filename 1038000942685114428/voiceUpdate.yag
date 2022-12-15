@@ -5,9 +5,11 @@
 {{ if $channel }}
     {{ $channel = getChannel $channel }}
     {{ range $JTCChannels }}
-        {{ if eq .ID $channel }}
-            {{ $JTC = . }}
-            {{ break }}
+        {{ if .ID }}
+            {{ if eq .ID $channel }}
+                {{ $JTC = . }}
+                {{ break }}
+            {{ end }}
         {{ end }}
     {{ end }}
 {{ end }}
@@ -54,4 +56,13 @@
         {{ $JTCChannels = $JTCChannels.Append $JTC }}
         {{ dbSet 0 "JTCChannels" $JTCChannels }}
     {{ end }}
+{{ end }}
+{{ $newChannels := cslice }}
+{{ range $JTCChannels }}
+    {{ if .ID }}
+        {{ $newChannels = $newChannels.Append . }}
+    {{ end }}
+{{ end }}
+{{ if ne $newChannels $JTCChannels }}
+    {{ dbSet 0 "JTCChannels" $newChannels }}
 {{ end }}
