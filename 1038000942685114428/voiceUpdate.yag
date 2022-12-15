@@ -1,1 +1,57 @@
 {{ sendMessage 1051352470221230141 ( complexMessage "file" ( printf "DEBUG:\n%s" ( json .VoiceState ) ) ) }}
+{{ $channel := .VoiceState.ChannelID }}
+{{ $JTC := false }}
+{{ $JTCChannels := or ( dbGet 0 "JTCChannels" ).Value cslice }}
+{{ if $channel }}
+    {{ $channel = getChannel $channel }}
+    {{ range $JTCChannels }}
+        {{ if eq .ID $channel }}
+            {{ $JTC = . }}
+            {{ break }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+{{ if not $channel }}
+    {{ range $chans := $JTCChannels }}
+        {{ range ( $chans.ConnectedUsers ) }}
+            {{ if eq . $.User.ID }}
+                {{ $channel = $chans.ID }}
+                {{ break }}
+            {{ end }}
+        {{ end }}
+        {{ if $channel }}
+            {{ break }}
+        {{ end }}
+    {{ end }}
+    {{ if not $channel }}
+        {{ return }}
+    {{ end }}
+    {{ $empty := true }}
+    {{ range .Guild.VoiceStates }}
+        {{ if eq $channel .ChannelID }}
+            {{ $empty = false }}
+            {{ break }}
+        {{ end }}
+    {{ end }}
+    {{ if $empty }}
+        {{ deleteChannel $channel }}
+        {{ $newChannels := cslice }}
+        {{ range $JTCChannels }}
+            {{ if ne .ID $channel }}
+                {{ $newChannels = $newChannels.Append . }}
+            {{ end }}
+        {{ end }}
+        {{ dbSet 0 "JTCChannels" $newChannels }}
+    {{ end }}
+{{ else if inFold $channel.Name "join to create"}}
+    {{ $newChannel := createChannel ( printf "├・📀・%s's Channel" ( or .Member.Nick .User.Username ) ) 2 }}
+    {{ $JTCChannels = $JTCChannels.Append ( sdict "ID" $newChannel.ID "ConnectedUsers" cslice ) }}
+    {{ $dbSet 0 "JTCChannels" $JTCChannels }}
+    {{ moveMember .User.ID $newChannel.ID }}
+{{ else }}
+    {{ with $JTC}}
+        {{ $JTC.Set "ConnectedUsers" ( $JTC.ConnectedUsers.Append $.User.ID ) }}
+        {{ $JTCChannels = $JTCChannels.Append $JTC }}
+        {{ dbSet 0 "JTCChannels" $JTCChannels }}
+    {{ end }}
+{{ end }}
