@@ -46,7 +46,7 @@
 {{ else if inFold $channel.Name "join to create"}}
     {{ $newChannel := createChannel ( printf "├・📀・%s's Channel" ( or .Member.Nick .User.Username ) ) 2 }}
     {{ $JTCChannels = $JTCChannels.Append ( sdict "ID" $newChannel.ID "ConnectedUsers" cslice ) }}
-    {{ $dbSet 0 "JTCChannels" $JTCChannels }}
+    {{ dbSet 0 "JTCChannels" $JTCChannels }}
     {{ moveMember .User.ID $newChannel.ID }}
 {{ else }}
     {{ with $JTC}}
