@@ -1,1 +1,1 @@
-DEBUG: VS
+{{ sendMessage 1051352470221230141 ( printf "DEBUG:\n```json\n%s```" ( json .VoiceState ) ) }}
