@@ -18,7 +18,9 @@
 {{ range $chans := $JTCChannels }}
     {{ if not ( $voiceStateChans.Get ( str $chans.ID ) ) }}
         {{ sendMessage 1051352470221230141 ( complexMessage "content" ( printf "DEBUG: <#%d> `%d`" $chans.ID $chans.ID ) ) }}
-        {{ deleteChannel $chans.ID }}
+        {{ if getChannel $chans.ID }}
+            {{ deleteChannel $chans.ID }}
+        {{ end }}
         {{ $newChannels := cslice }}
         {{ range $JTCChannels }}
             {{ if ne .ID $chans.ID }}
