@@ -1,0 +1,14 @@
+{{ $db := or ( dbGet .User.ID "member" ).Value (
+    sdict
+    "OnServer" false
+    "Agreed" false
+    "Staff" false
+) }}
+{{ sendResponse ( complexMessage
+    "ephemeral" true
+    "content" "Thank you for agreeing to the rules. Welcome to Shiloh!"
+) }}
+{{ addRoleID 1038017288810537030 }}
+{{ $db.Set "OnServer" true }}
+{{ $db.Set "Agreed" true }}
+{{ dbSet .User.ID "member" $db }}

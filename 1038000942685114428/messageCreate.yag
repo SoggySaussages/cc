@@ -129,7 +129,31 @@
         {{ sendMessage nil "You don't have permission to use that command!" }}
         {{ return }}
     {{ end }}
-    {{ sendMessage .Channel.ID ( cembed "description" "DEBUG" ) }}
+    {{ sendMessage .Channel.ID ( complexMessage
+        "embed" ( cembed
+            "title" "Shiloh Esports Official Rules!"
+            "description" `**1.** No racial slurs / comments
+**2.** Sexism is not allowed
+**3.** No ear-raping in Voice Channels
+**4.** No toxicity towards staff or other community members
+**5.** Respect our staff, they work hard to keep this server running smoothly!
+**6.** Use the channels solely for their purposes
+**7.** No spamming
+**8.** Keep the conversations in English
+**9.** No slurs, no exceptions
+**10.** Don't ghost ping
+**11.** No NSFW or obscene content. This includes text, images, or links featuring nudity, sex, hard violence, or other graphically disturbing content
+**12.** Do not discuss recent tragedies, racism, politics or religious views in our server`
+            "footer" "Please Note: If you fail to follow our rules then we will take action! Apart from that have a great time here in Shiloh!"
+        )
+        "components" ( cslice ( cslice
+            ( button
+                "label" "I have read and agree to the rules"
+                "style" 3
+                "customid" "templates-verify"
+            )
+        ) )
+    ) }}
 {{ end }}
 
 {{ define "registerstaff" }}
