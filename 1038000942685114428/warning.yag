@@ -32,7 +32,7 @@
 {{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
 {{ $fields = $fields.Append ( print "ID: " .WarningID ) }}
 {{ $fields = $fields.Append ( print "Logs: " $msg.Logs ) }}
-{{ sendMessage ( ( dbGet 0 "mod-log" ).Value | toInt ) (
+{{ sendMessage ( ( dbGet 0 "mod-log" ).Value | toInt ) ( complexMessage "embed" (
     cembed
     "title" .Guild.Name
     "timestamp" currentTime
@@ -41,5 +41,5 @@
     "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) )
     "author" ( sdict "icon_url" "https://cdn.discordapp.com/emojis/1052516040438984724.webp?size=240&quality=lossless" "name" "Warned" )
     "color" 16547631
-) }}
+) ) }}
 {{ dbSet .User.ID "moderation" $db }}
