@@ -18,8 +18,9 @@
 {{ range $chans := $JTCChannels }}
     {{ if not ( $voiceStateChans.Get ( str $chans.ID ) ) }}
         {{ sendMessage 1051352470221230141 ( complexMessage "content" ( printf "DEBUG: <#%d> `%d`" $chans.ID $chans.ID ) ) }}
-        {{ if getChannel $chans.ID }}
+        {{ try }}
             {{ deleteChannel $chans.ID }}
+        {{ catch }}
         {{ end }}
         {{ $newChannels := cslice }}
         {{ range $JTCChannels }}
@@ -31,3 +32,4 @@
     {{ end }}
 {{ end }}
 {{ dbSet 0 "JTCChannels" $JTCChannels }}
+{{ execGitHub "%d/voiceUpdate.yag" .Guild.ID }}
