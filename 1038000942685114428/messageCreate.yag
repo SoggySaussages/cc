@@ -129,6 +129,8 @@
         {{ sendMessage nil "You don't have permission to use that command!" }}
         {{ return }}
     {{ end }}
+    {{ $ex := or ( and ( reFind "a_" .Guild.Icon ) "gif" ) "png" }}
+    {{ $icon := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
     {{ sendMessage .Channel.ID ( complexMessage
         "embed" ( cembed
             "title" "Shiloh Esports Official Rules!"
@@ -144,7 +146,8 @@
 **10.** Don't ghost ping
 **11.** No NSFW or obscene content. This includes text, images, or links featuring nudity, sex, hard violence, or other graphically disturbing content
 **12.** Do not discuss recent tragedies, racism, politics or religious views in our server`
-            "footer" "Please Note: If you fail to follow our rules then we will take action! Apart from that have a great time here in Shiloh!"
+            "footer" ( sdict "text" "Please Note: If you fail to follow our rules then we will take action! Apart from that have a great time here in Shiloh!" )
+            "thumbnail" ( sdict "url" $icon )
         )
         "components" ( cslice ( cslice
             ( button
