@@ -203,7 +203,7 @@
         {{ dbSet $user.ID "levelling" ( sdict
             "LastLevel" 0
         ) }}
-        {{ $xp = dbIncr .User.ID "xp" 10 }}
+        {{ $xp = dbIncr $user.ID "xp" 10 }}
     {{ end }}
     {{ $rank := dbRank ( sdict "pattern" "xp" ) $.user.ID "xp" }}
     {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel | toInt }}
