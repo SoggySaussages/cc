@@ -301,19 +301,11 @@
     {{ with $match }}
         {{ $args := cslice }}
         {{ range .Args }}
-            {{ $cur := cslice }}
+            {{ $argTmpl := "<%s:%s>" }}
             {{ if .Optional }}
-                {{ $cur = $cur.Append "[" }}
-            {{ else }}
-                {{ $cur = $cur.Append "<" }}
+                {{ $argTmpl = "[%s:%s]" }}
             {{ end }}
-            {{ $cur = $cur.Append ( printf "%s:%s" .Name .Type ) }}
-            {{ if .Optional }}
-                {{ $cur = $cur.Append "]" }}
-            {{ else }}
-                {{ $cur = $cur.Append ">" }}
-            {{ end }}
-            {{ $args = $args.Append ( joinStr "" $cur ) }}
+            {{ $args = $args.Append ( printf $argTmpl .Name .Type ) }}
         {{ end }}
         {{ $emb := sdict 
         "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
@@ -358,19 +350,11 @@
         {{ with .ExecutedCommand }}
             {{ $args := cslice }}
             {{ range .Args }}
-                {{ $cur := cslice }}
+                {{ $argTmpl := "<%s:%s>" }}
                 {{ if .Optional }}
-                    {{ $cur = $cur.Append "[" }}
-                {{ else }}
-                    {{ $cur = $cur.Append "<" }}
+                    {{ $argTmpl = "[%s:%s]" }}
                 {{ end }}
-                {{ $cur = $cur.Append ( printf "%s:%s" .Name .Type ) }}
-                {{ if .Optional }}
-                    {{ $cur = $cur.Append "]" }}
-                {{ else }}
-                    {{ $cur = $cur.Append ">" }}
-                {{ end }}
-                {{ $args = $args.Append ( joinStr "" $cur ) }}
+                {{ $args = $args.Append ( printf $argTmpl .Name .Type ) }}
             {{ end }}
             {{ $emb := sdict 
                 "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
@@ -380,6 +364,7 @@
             {{ end }}
             {{ sendMessage nil ( complexMessage "embed" ( cembed $emb ) "content" "Invalid syntax! See proper syntax below:" ) }}
         {{ end }}
+        {{ return }}
     {{ end }}
     {{ $template := sdict
         "restart" ( sdict "PT" "Restarting" "color" 9910440 )
@@ -399,6 +384,58 @@
         "timestamp" currentTime
     ) ) }}
     {{ deleteTrigger 0 }}
+{{ end }}
+
+{{ define "button" }}
+    {{ $badParse := false }}
+    {{ if lt ( len .CmdArgs ) 2 }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ $message := false }}
+    {{ with getMessage nil ( index .CmdArgs 0 | toInt ) }}
+        {{ $message = . }}
+    {{ else }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ $cid := index .CmdArgs 1 }}
+    {{ $label := reReplace `\Q\s\E` ( index .CmdArgs 2 ) " " }}
+    {{ $type := 1 }}
+    {{ with index .CmdArgs 3 }}
+        {{ with toInt . }}
+            {{ if and ( ge . 1 ) ( le . 5 ) }}
+                {{ $type = . }}
+            {{ else }}
+                {{ $badParse = true }}
+            {{ end }}
+        {{ else }}
+            {{ $badParse = true }}
+        {{ end }}
+    {{ end }}
+
+    {{ if $badParse }}
+        {{ with .ExecutedCommand }}
+            {{ $args := cslice }}
+            {{ range .Args }}
+                {{ $argTmpl := "<%s:%s>" }}
+                {{ if .Optional }}
+                    {{ $argTmpl = "[%s:%s]" }}
+                {{ end }}
+                {{ $args = $args.Append ( printf $argTmpl .Name .Type ) }}
+            {{ end }}
+            {{ $emb := sdict 
+                "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
+                "description" ( print "```" ( joinStr " " ( ( cslice .Trigger ).AppendSlice $args ) ) "```\n" .Description ) }}
+            {{ with .RequiredPerms }}
+                {{ $emb.Set "footer" ( sdict "text" .Readable ) }}
+            {{ end }}
+            {{ sendMessage nil ( complexMessage "embed" ( cembed $emb ) "content" "Invalid syntax! See proper syntax below:" ) }}
+        {{ end }}
+        {{ return }}
+    {{ end }}
+    
+    {{ $button := button "id" $cid "label" $label "type" $type }}
+    {{ $m := structToSdict $ }}
+    {{ editMessage nil $message.ID ( complexMessageEdit "components" ( cslice ( cslice $button ) ) ) }}
 {{ end }}
 
 
@@ -455,7 +492,7 @@
     "Trigger" "Json"
     "Aliases" cslice
     "Template" "json"
-    "Args" ( cslice ( sdict "Optional" false "Type" "string" "Name" "JSON to send" ) )
+    "Args" ( cslice ( sdict "Optional" false "Type" "text" "Name" "JSON to send" ) )
     "Description" "Converts provided JSON payload to a message, and sends it"
     "RequiredPerms" ( sdict "Readable" "Manage Messages" "Bitwise" .Permissions.ManageMessages )
 )
@@ -464,7 +501,7 @@
     "Trigger" "Help"
     "Aliases" ( cslice "h" )
     "Template" "help"
-    "Args" ( cslice ( sdict "Optional" true "Type" "string" "Name" "Command" ) )
+    "Args" ( cslice ( sdict "Optional" true "Type" "text" "Name" "Command" ) )
     "Description" "Returns help info for the provided command"
 )
 ( sdict
@@ -475,6 +512,15 @@
     "Args" ( cslice ( sdict "Optional" true "Type" "duration" "Name" "Duration" ) ( sdict "Optional" true "Type" "flag" "Name" "Restart" ) ( sdict "Optional" true "Type" "flag" "Name" "Unstable" ) ( sdict "Optional" true "Type" "flag" "Name" "Offline" ) ( sdict "Optional" true "Type" "flag" "Name" "Online" ) )
     "Description" "Returns a downtime message"
     "RequiredPerms" ( sdict "Readable" "Administrator" "Bitwise" .Permissions.Administrator )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "AppendButton"
+    "Aliases" ( cslice "button" "apbtn" )
+    "Template" "button"
+    "Args" ( cslice ( sdict "Optional" false "Type" "number" "Name" "Message ID" ) ( sdict "Optional" false "Type" "text" "Name" "Button ID" ) ( sdict "Optional" true "Type" "number" "Name" "Style" ) )
+    "Description" "Adds a button to the given message"
+    "RequiredPerms" ( sdict "Readable" "Manage Messages" "Bitwise" .Permissions.ManageMessages )
 )
 ) }}
 
@@ -524,6 +570,8 @@
                 {{ template "help" $ }}
             {{ else if eq .Template "downtime" }}
                 {{ template "downtime" $ }}
+            {{ else if eq .Template "button" }}
+                {{ template "button" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
