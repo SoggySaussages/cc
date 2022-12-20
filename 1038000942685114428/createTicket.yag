@@ -1,3 +1,3 @@
 {{ $ticket := createTicket nil "Support" }}
-{{ $silent := sendResponse ( complexMessage "content" ( printf "Your ticket was opened in <#%d>." $ticket.ID ) ) }}
-{{ dbSet $ticket.ID "ticket" $ticket }}
+{{ $silent := sendResponse ( complexMessage "content" ( printf "Your ticket was opened in <#%d>." $ticket.ChannelID ) ) }}
+{{ dbSet $ticket.ChannelID "ticket" $ticket }}
