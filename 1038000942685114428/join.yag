@@ -3,6 +3,7 @@
     "OnServer" false
     "Agreed" false
     "Staff" false
+    "WelcomeMsg" .Message.ID
 ) }}
 {{ $db.Set "OnServer" true }}
 {{$ex := or (and (reFind "a_" .Guild.Icon) "gif" ) "png" }}
@@ -11,7 +12,7 @@
     cembed
     "title" ( printf "%s just joined!" .User )
     "author" ( sdict "icon_url" $icon "name" .Guild.Name )
-    "description" ( printf "They are member #%d :)" .Guild.MemberCount )
+    "description" ( printf "They are member #%d :)\nThey should get verified in <#1038367339407736842>" .Guild.MemberCount )
     "footer" ( sdict "text" "They've been a member since" )
     "timestamp" ( snowflakeToTime .User.ID )
     "color" ( randInt 0xFFFFFF )

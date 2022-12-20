@@ -5,4 +5,10 @@
     "Staff" false
 ) }}
 {{ $db.Set "OnServer" false }}
+{{ with $db.WelcomeMsg }}
+    {{ $m := getMessage nil . }}
+    {{ $emb := structToSdict ( index $m.Embeds 0 ) }}
+    {{ $emb.Set "description" ( reReplace `They should get verified in <#1038367339407736842>|They've gotten verified and are now a member of Shiloh!` $emb.Description "But now they've left the server :(" ) }}
+    {{ editMessage nil .  }}
+{{ end }}
 {{ dbSet .User.ID "member" $db }}

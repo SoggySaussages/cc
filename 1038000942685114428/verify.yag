@@ -25,5 +25,11 @@
     {{ addRoleID 1038017288810537030 }}
     {{ $db.Set "OnServer" true }}
     {{ $db.Set "Agreed" true }}
+    {{ with $db.WelcomeMsg }}
+        {{ $m := getMessage nil . }}
+        {{ $emb := structToSdict ( index $m.Embeds 0 ) }}
+        {{ $emb.Set "description" ( reReplace `They should get verified in <#1038367339407736842>` $emb.Description "They've gotten verified and are now a member of Shiloh!" ) }}
+        {{ editMessage nil .  }}
+    {{ end }}
 {{ end }}
 {{ dbSet .User.ID "member" $db }}
