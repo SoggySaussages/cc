@@ -1,0 +1,1 @@
+{{ $silent := respond ( complexMessage "content" ( exec "catfact" ) ) }}
