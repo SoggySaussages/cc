@@ -392,8 +392,9 @@
     {{ end }}
     {{ sendMessage nil ( complexMessage "embed" ( cembed
         "title" ( printf "The bot is currently %s." ( $template.Get $flag ).PT )
-        "description" $duration
+        "description" ( printf "As of <t:%d:F>\n%s" currentTime.Unix $duration )
         "color" ( $template.Get $flag ).color
+        "timestamp" currentTime
     ) ) }}
 {{ end }}
 
