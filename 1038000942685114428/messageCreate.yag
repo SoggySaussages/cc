@@ -202,6 +202,7 @@
             {{ $out = $out.Append ( printf "Failed to modify registration of **%s** as a staff member." . ) }}
         {{ end }}
     {{ end }}
+    {{ sendMessage nil ( complexMessage "content" $out ) }}
 {{ end }}
 
 {{ define "rank" }}
