@@ -1,4 +1,14 @@
 {{ $ := sdict . }}
+
+{{ if eq .Channel.ID 1048153843378180136 }}
+    {{ if eq .User.ID 302050872383242240 }}
+        {{ if in ( structToSdict ( index .Message.Embeds 0 ) ).description "Bump done!" }}
+            {{ $member := .Message.ReferencedMessage.Author.ID | getMember }}
+            {{ sendMessage nil ( printf "Thanks for bumping, %s!" ) ( or $member.Nick $member.User.Username ) }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
 {{ if not .User.ID }}
     {{ return }}
 {{ end }}
@@ -334,8 +344,8 @@
     {{ end }}
     {{ $flag := false }}
     {{ with reFind `-\S+` .StrippedMsg | lower }}
-        {{ if in ( cslice "restart" "offline" "unstable" "online" ) . }}
-            {{ $flag = . }}
+        {{ if in ( cslice "restart" "offline" "unstable" "online" ) ( slice . 1 ) }}
+            {{ $flag = slice . 1 }}
         {{ else }}
             {{ $badParse = true }}
         {{ end }}
