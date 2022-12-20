@@ -396,6 +396,7 @@
         "color" ( $template.Get $flag ).color
         "timestamp" currentTime
     ) ) }}
+    {{ deleteTrigger 0 }}
 {{ end }}
 
 
