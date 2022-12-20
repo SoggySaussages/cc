@@ -556,6 +556,9 @@
 {{ end }}
 
 {{ block "automod" $ }}
+    {{ if hasPermissions .Permissions.ManageServer }}
+        {{ return }}
+    {{ end }}
     {{ $db := or ( dbGet .User.ID "automod" ).Value ( sdict
         "lengthscore" cslice
     ) }}
