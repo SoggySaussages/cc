@@ -9,6 +9,7 @@
         "ephemeral" true
         "content" "You've already agreed to the rules!"
     ) }}
+    {{ $db.Set "Agreed" false }}
 {{ else }}
     {{ $silent := sendResponse ( complexMessage
         "ephemeral" true
@@ -17,5 +18,5 @@
     {{ addRoleID 1038017288810537030 }}
     {{ $db.Set "OnServer" true }}
     {{ $db.Set "Agreed" true }}
-    {{ dbSet .User.ID "member" $db }}
 {{ end }}
+{{ dbSet .User.ID "member" $db }}
