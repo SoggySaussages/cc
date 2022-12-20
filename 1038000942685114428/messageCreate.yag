@@ -133,13 +133,13 @@
     {{ with ( dbGet .User.ID "member" ) }}
         {{ $db = .Value }}
     {{ end }}
-    {{ if in $.Message.Content "resetxp" }}
-        {{ dbDel .User.ID "levelling" }}
-        {{ dbDel .User.ID "xp" }}
-        {{ sendMessage nil "Reset your XP data" }}
-    {{ end }}
     {{ if not $db.Staff }}
         {{ sendMessage nil "You don't have permission to use that command!" }}
+        {{ return }}
+    {{ end }}
+    {{ if in $.Message.Content "resetmember" }}
+        {{ dbDel .User.ID "member" }}
+        {{ sendMessage nil "Reset your member data" }}
         {{ return }}
     {{ end }}
     {{ $ex := or ( and ( reFind "a_" .Guild.Icon ) "gif" ) "png" }}
