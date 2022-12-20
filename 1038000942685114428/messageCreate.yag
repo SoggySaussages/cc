@@ -561,6 +561,7 @@
     ) }}
     {{ $memberAge := currentTime.Sub .Member.JoinedAt }}
     {{ $willDelete := false }}
+    {{ $willTO := false }}
     {{ if gt ( len .Message.Content ) 500 }}
         {{ $db.Set "lengthscore" ( $db.lengthscore.Append currentTime ).Append currentTime }}
         {{ if gt ( len .Message.Content ) 800 }}
