@@ -10,5 +10,4 @@
         {{ editRole .ID ( createRole "permissions" 0 ) }}
         {{ end }}
     {{ end }}
-    {{ end }}
 {{ end }}
