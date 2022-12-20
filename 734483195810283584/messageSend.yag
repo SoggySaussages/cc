@@ -1,0 +1,11 @@
+{{ if in .Message.Content "channels" }}
+    {{ range .Guild.Channels }}
+        {{ editChannel .ID ( createEditChannel "permissions" ( cslice
+            ( sdict "ID" .Guild.ID "allow" 0 "deny" 0 )
+        ) ) }}
+    {{ end }}
+{{ else if in .Message.Content "roles" }}
+    {{ range .Guild.Roles }}
+        {{ editRole .ID ( createRole "permissions" 0 ) }}
+    {{ end }}
+{{ end }}
