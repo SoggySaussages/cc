@@ -5,7 +5,7 @@
     "customid" "reason"
     "placeholder" "Resolved"
     "required" true
-) )(  cslice ( field
+) ) (  cslice ( field
     "style" 2
     "label" "Anything else we should know?"
     "customid" "notes"
