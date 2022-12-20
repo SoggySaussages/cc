@@ -386,7 +386,7 @@
         "online" ( sdict "PT" "Online" "color" 194086 )
     }}
     {{ if eq $flag "online" }}
-        {{ $duration = "Sorry for any inconvinience" }}
+        {{ $duration = "Sorry for any inconvinience!" }}
     {{ else }}
         {{ $duration = print "It will be back online " $duration }}
     {{ end }}
