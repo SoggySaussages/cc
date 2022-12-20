@@ -333,7 +333,7 @@
         {{ $duration = "shortly" }}
     {{ end }}
     {{ $flag := false }}
-    {{ with reFind `-\S+` .StrippedMsg | toLower }}
+    {{ with reFind `-\S+` .StrippedMsg | lower }}
         {{ if in ( cslice "restart" "offline" "unstable" "online" ) . }}
             {{ $flag = . }}
         {{ else }}
