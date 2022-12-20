@@ -554,3 +554,51 @@
         {{ $silent := dbIncr $.User.ID "xp" 10 }}
     {{ end }}
 {{ end }}
+
+{{ block "automod" $ }}
+    {{ $db := or ( dbGet .User.ID "automod" ).Value ( sdict
+        "lengthscore" cslice
+    ) }}
+    {{ $memberAge := currentTime.Sub .Member.JoinedAt }}
+    {{ $willDelete := false }}
+    {{ if gt ( len .Message.Content ) 500 }}
+        {{ $db.Set "lengthscore" = ( $db.lengthscore.Append currentTime ).Append currentTime }}
+        {{ if gt ( len .Message.Content ) 800 }}
+            {{ $db.Set "lengthscore" = $db.lengthscore.Append currentTime }}
+            {{ if lt $memberAge ( toDuration "12h" ) }}
+                {{ $willDelete = true }}
+            {{ end }}
+            {{ if gt ( len .Message.Content ) 950 }}
+                {{ $db.Set "lengthscore" = $db.lengthscore.Append currentTime }}
+                {{ $willDelete = true }}
+                {{ if lt $memberAge ( toDuration "1h" ) }}
+                    {{ $willTO = true }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+        {{ $updated := cslice }}
+        {{ $spam := cslice }}
+        {{ range $db.lengthscore }}
+            {{ if currentTime.Before ( .Add ( toDuration "1m" ) ) }}
+                {{ $spam = $spam.Append . }}
+            {{ end }}
+            {{ if currentTime.Before ( .Add ( toDuration "10m" ) ) }}
+                {{ $updated = $updated.Append . }}
+            {{ end }}
+        {{ end }}
+        {{ $db.Set "lengthscore" $updated }}
+        {{ dbSet .User.ID "automod" $db }}
+        {{ if or ( ge ( len $db.lengthscore ) 8 ) ( ge ( len $spam ) 6 ) }}
+            {{ $willTO = true }}
+        {{ else if or ( ge ( len $db.lengthscore ) 6 ) ( ge ( len $spam ) 5 ) }}
+            {{ $willDelete = true }}
+        {{ end }}
+        {{ if $willDelete }}
+            {{ deleteTrigger }}
+            {{ execAdmin "warn" .User.ID "You may not send messages that long." }}
+        {{ end }}
+        {{ if $willTO }}
+            {{ execAdmin "to" .User.ID "1d" "You have sent too many long messages." }}
+        {{ end }}
+    {{ end }}
+{{ end }}
