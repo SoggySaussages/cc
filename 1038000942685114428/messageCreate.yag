@@ -338,7 +338,7 @@
     {{ $duration := false }}
     {{ with toDuration ( index .CmdArgs 0 ) }}
         {{ $until := currentTime.Add . }}
-        {{ $duration = printf "at <t:%s:F> (<t:%s:R>)" $until.Unix $until.Unix }}
+        {{ $duration = printf "at <t:%d:F> (<t:%d:R>)" $until.Unix $until.Unix }}
     {{ else }}
         {{ $duration = "shortly" }}
     {{ end }}
