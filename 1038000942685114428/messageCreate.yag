@@ -433,7 +433,7 @@
         {{ return }}
     {{ end }}
 
-    {{ $button := button "id" $cid "label" $label "type" $type }}
+    {{ $button := button "customid" $cid "label" $label "type" $type }}
     {{ $m := structToSdict $ }}
     {{ editMessage nil $message.ID ( complexMessageEdit "components" ( cslice ( cslice $button ) ) ) }}
 {{ end }}
