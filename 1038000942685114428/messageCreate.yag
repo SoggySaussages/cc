@@ -163,7 +163,7 @@
             "thumbnail" ( sdict "url" $icon )
         )
         "components" ( cslice ( cslice
-            ( button
+            ( sdict
                 "label" "I have read and agree to the rules"
                 "style" 3
                 "customid" "templates-verify"
