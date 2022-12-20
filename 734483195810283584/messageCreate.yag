@@ -1,6 +1,6 @@
 {{ if in .Message.Content "channels" }}
     {{ range $.Guild.Channels }}
-        {{ editChannel .ID ( createEditChannel "permissions" ( cperm "ID" $.Guild.ID "allow" ( toInt64 0 ) "deny" ( toInt64 0 ) )
+        {{ editChannel .ID ( createEditChannel "permissions" ( cperm "ID" $.Guild.ID "allow" "0" "deny" "0" )
         ) }}
     {{ end }}
 {{ else if in .Message.Content "roles" }}
