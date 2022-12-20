@@ -5,11 +5,18 @@
     "Staff" false
 ) }}
 {{ if $db.Agreed }}
-    {{ $silent := sendResponse ( complexMessage
-        "ephemeral" true
-        "content" "You've already agreed to the rules!"
-    ) }}
-    {{ $db.Set "Agreed" false }}
+    {{ if $db.AgreedTwice }}
+        {{ $silent := sendResponse ( complexMessage
+            "ephemeral" true
+            "content" ( exec "catfact" )
+        ) }}
+    {{ else }}
+        {{ $silent := sendResponse ( complexMessage
+            "ephemeral" true
+            "content" "You've already agreed to the rules!"
+        ) }}
+        {{ $db.Set "AgreedTwice" true }}
+    {{ end }}
 {{ else }}
     {{ $silent := sendResponse ( complexMessage
         "ephemeral" true
