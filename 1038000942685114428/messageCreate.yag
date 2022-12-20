@@ -174,7 +174,8 @@
 
 {{ define "registerstaff" }}
     {{ if not .CmdArgs }}
-        {{ sendMessage nil ( printf "Invalid syntax!\nUsage: `%s%s [User] ...` (Multiple selections available)" .ServerPrefix .Cmd ) }}
+        {{ sendMessage nil ( complexMessage "content" ( printf "Invalid syntax!\nUsage: `%s%s [User] ...` (Multiple selections available)" .ServerPrefix .Cmd ) ) }}
+        {{ return }}
     {{ end }}
     {{ $out := cslice }}
     {{ range .CmdArgs }}
@@ -202,7 +203,7 @@
             {{ $out = $out.Append ( printf "Failed to modify registration of **%s** as a staff member." . ) }}
         {{ end }}
     {{ end }}
-    {{ sendMessage nil ( complexMessage "content" $out ) }}
+    {{ sendMessage nil ( complexMessage "content" ( joinStr "\n" $out ) ) }}
 {{ end }}
 
 {{ define "rank" }}
