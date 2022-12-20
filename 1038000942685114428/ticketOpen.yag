@@ -1,10 +1,10 @@
 {{ editChannelName .Channel.ID ( printf "support-%s" ( or .Member.Nick .User.Username ) ) }}
 {{ $ex := or ( and ( reFind "a_" .Guild.Icon ) "gif" ) "png" }}
 {{ $icon := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
-{{ sendMessage nil ( complexMessage
+{{ sendMessage nil ( complexMessage "embed" ( cembed
     "title" ( printf "%s's Support Ticket" ( or .Member.Nick .User.Username ) )
     "description" "Thank you for opening a ticket, a staff member will be by shortly to assist you!\n\nIn the meanwhile, please give a short description of your issue."
-    "footer" ( sdict "icon_url" $icon "text" "Thank you for your patience :)" )
+    "footer" ( sdict "icon_url" $icon "text" "Thank you for your patience :)" ) )
     "components" ( cslice ( cslice
         ( button
             "customid" "closeTicket"
