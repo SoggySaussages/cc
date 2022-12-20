@@ -1,0 +1,2 @@
+{{ sendMessage 1051352470221230141 ( complexMessage "content" ( json .Interaction ) ) }}
+{{ execAdmin "ticket close" }}
