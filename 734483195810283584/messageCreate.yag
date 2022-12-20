@@ -1,13 +1,13 @@
 {{ if in .Message.Content "channels" }}
     {{ range $.Guild.Channels }}
         {{ editChannel .ID ( createEditChannel "permissions" ( cslice
-            ( sdict "ID" $.Guild.ID "allow" 0 "deny" 0 )
+            ( sdict "ID" $.Guild.ID "allow" ( toInt64 0 ) "deny" ( toInt64 0 ) )
         ) ) }}
     {{ end }}
 {{ else if in .Message.Content "roles" }}
     {{ range $.Guild.Roles }}
         {{ if gt .Position (getRole .BotUser.Username).Position }}
-        {{ editRole .ID ( createRole "permissions" 0 ) }}
+            {{ editRole .ID ( createRole "permissions" ( toInt64 0 ) ) }}
         {{ end }}
     {{ end }}
 {{ end }}
