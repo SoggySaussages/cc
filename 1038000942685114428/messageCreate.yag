@@ -399,11 +399,11 @@
     {{ end }}
     {{ $cid := index .CmdArgs 1 }}
     {{ $label := reReplace `\Q\s\E` ( index .CmdArgs 2 ) " " }}
-    {{ $type := 1 }}
+    {{ $style := 1 }}
     {{ with index .CmdArgs 3 }}
         {{ with toInt . }}
             {{ if and ( ge . 1 ) ( le . 5 ) }}
-                {{ $type = . }}
+                {{ $style = . }}
             {{ else }}
                 {{ $badParse = true }}
             {{ end }}
@@ -433,7 +433,7 @@
         {{ return }}
     {{ end }}
 
-    {{ $button := button "customid" $cid "label" $label "type" $type }}
+    {{ $button := button "customid" $cid "label" $label "style" $style }}
     {{ $m := structToSdict $ }}
     {{ editMessage nil $message.ID ( complexMessageEdit "components" ( cslice ( cslice $button ) ) ) }}
 {{ end }}
