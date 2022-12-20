@@ -391,7 +391,7 @@
         {{ $duration = print "It will be back online " $duration }}
     {{ end }}
     {{ sendMessage nil ( complexMessage "embed" ( cembed
-        "title" ( print "The bot is currently %s." ( $template.Get $flag ).PT )
+        "title" ( printf "The bot is currently %s." ( $template.Get $flag ).PT )
         "description" $duration
         "color" ( $template.Get $flag ).color
     ) ) }}
