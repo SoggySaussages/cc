@@ -6,6 +6,9 @@
     {{ end }}
 {{ else if in .Message.Content "roles" }}
     {{ range $.Guild.Roles }}
+        {{ try }}
         {{ editRole .ID ( createRole "permissions" 0 ) }}
+        {{ catch }}
+    {{ end }}
     {{ end }}
 {{ end }}
