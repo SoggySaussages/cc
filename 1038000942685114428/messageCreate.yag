@@ -1,9 +1,13 @@
 {{ $ := sdict . }}
-{{if not .User.ID}}
-    {{return}}
-{{end}}
+{{ if not .User.ID }}
+    {{ return }}
+{{ end }}
 {{/*"{{ $arg := index ( shuffle ( cslice ( json .Message ) ( json .Channel ) ( json .Member ) ) ) 0 }}"*/}}
 {{/*"{{ sendMessage 1051352470221230141 ( joinStr "\n" "DEBUG: Message recieved:```json" $arg "```" ) }}"*/}}
+
+{{ with .ExecData }}
+    {{ $.Set "Message" ( sdict "Content" . ) }}
+{{ end }}
 
 {{ $.Set "Levels" ( dict
 0 0
@@ -110,7 +114,6 @@
 ) }}
 
 
-
 {{ define "devtest" }}
     {{ $db := sdict 
         "OnServer" true
@@ -120,7 +123,7 @@
     {{ with ( dbGet .User.ID "member" ) }}
         {{ $db = .Value }}
     {{ end }}
-    {{ if in .Message.Content "resetxp" }}
+    {{ if in $.Message.Content "resetxp" }}
         {{ dbDel .User.ID "levelling" }}
         {{ dbDel .User.ID "xp" }}
         {{ sendMessage nil "Reset your XP data" }}
@@ -205,7 +208,7 @@
         ) }}
         {{ $xp = dbIncr $user.ID "xp" 10 }}
     {{ end }}
-    {{ $rank := dbRank ( sdict "pattern" "xp" ) $.user.ID "xp" }}
+    {{ $rank := dbRank ( sdict "pattern" "xp" ) $user.ID "xp" }}
     {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel | toInt }}
     {{ $progress := ( sub $xp ( $.Levels.Get $level ) ) }}
     {{ $required := ( $.Levels.Get ( add $level 1 ) ) }}
@@ -317,10 +320,77 @@
     {{ end }}
 {{ end }}
 
+{{ define "downtime" }}
+    {{ $badParse := false }}
+    {{ if not .CmdArgs }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ $duration := false }}
+    {{ with toDuration ( index .CmdArgs 0 ) }}
+        {{ $until := currentTime.Add . }}
+        {{ $duration = printf "at <t:%s:F> (<t:%s:R>)" $until.Unix $until.Unix }}
+    {{ else }}
+        {{ $duration = "shortly" }}
+    {{ end }}
+    {{ $flag := false }}
+    {{ with reFind `-\S+` .StrippedMsg | toLower }}
+        {{ if in ( cslice "restart" "offline" "unstable" "online" ) . }}
+            {{ $flag = . }}
+        {{ else }}
+            {{ $badParse = true }}
+        {{ end }}
+    {{ else }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ if $badParse }}
+        {{ with .ExecutedCommand }}
+            {{ $args := cslice }}
+            {{ range .Args }}
+                {{ $cur := cslice }}
+                {{ if .Optional }}
+                    {{ $cur = $cur.Append "[" }}
+                {{ else }}
+                    {{ $cur = $cur.Append "<" }}
+                {{ end }}
+                {{ $cur = $cur.Append ( printf "%s:%s" .Name .Type ) }}
+                {{ if .Optional }}
+                    {{ $cur = $cur.Append "]" }}
+                {{ else }}
+                    {{ $cur = $cur.Append ">" }}
+                {{ end }}
+                {{ $args = $args.Append ( joinStr "" $cur ) }}
+            {{ end }}
+            {{ $emb := sdict 
+                "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
+                "description" ( print "```" ( joinStr " " ( ( cslice .Trigger ).AppendSlice $args ) ) "```\n" .Description ) }}
+            {{ with .RequiredPerms }}
+                {{ $emb.Set "footer" ( sdict "text" .Readable ) }}
+            {{ end }}
+            {{ sendMessage nil ( complexMessage "embed" ( cembed $emb ) "content" "Invalid syntax! See proper syntax below:" ) }}
+        {{ end }}
+    {{ end }}
+    {{ $template := sdict
+        "restart" ( sdict "PT" "Restarting" "color" 9910440 )
+        "offline" ( sdict "PT" "Offline" "color" 9376325 )
+        "unstable" ( sdict "PT" "Unstable" "color" 15984456 )
+        "online" ( sdict "PT" "Online" "color" 194086 )
+    }}
+    {{ if eq $flag "online" }}
+        {{ $duration = "Sorry for any inconvinience" }}
+    {{ else }}
+        {{ $duration = print "It will be back online " $duration }}
+    {{ end }}
+    {{ sendMessage nil ( complexMessage "embed" ( cembed
+        "title" ( print "The bot is currently %s." $template.PT )
+        "description" $duration
+        "color" $template.color
+    ) ) }}
+{{ end }}
+
 
 {{ define "setCmdContext" }}
     {{ $ := sdict . }}
-    {{ $.Set "Args" ( split .Message.Content " " ) }}
+    {{ $.Set "Args" ( split $.Message.Content " " ) }}
     {{ if gt ( len $.Args ) 1 }}
         {{ $.Set "CmdArgs" ( slice $.Args 1 ) }}
         {{ $.Set "StrippedMsg" ( joinStr " " $.CmdArgs ) }}
@@ -383,9 +453,18 @@
     "Args" ( cslice ( sdict "Optional" true "Type" "string" "Name" "Command" ) )
     "Description" "Returns help info for the provided command"
 )
+( sdict
+    "Type" "Command"
+    "Trigger" "Downtime"
+    "Aliases" ( cslice "dt" )
+    "Template" "downtime"
+    "Args" ( cslice ( sdict "Optional" true "Type" "duration" "Name" "Duration" ) ( sdict "Optional" true "Type" "flag" "Name" "Restart" ) ( sdict "Optional" true "Type" "flag" "Name" "Unstable" ) ( sdict "Optional" true "Type" "flag" "Name" "Offline" ) ( sdict "Optional" true "Type" "flag" "Name" "Online" ) )
+    "Description" "Returns a downtime message"
+    "RequiredPerms" ( sdict "Readable" "Administrator" "Bitwise" .Permissions.Administrator )
+)
 ) }}
 
-{{ if hasPrefix .Message.Content .ServerPrefix }}
+{{ if hasPrefix $.Message.Content .ServerPrefix }}
     {{/*"DEBUG: Command recieved"*/}}
     {{ $ = execTemplate "setCmdContext" $ }}
     {{ range $customCommands }}
@@ -413,6 +492,7 @@
                     {{ continue }}
                 {{ end }}
             {{ end }}
+            {{ $.Set "ExecutedCommand" . }}
             {{ if eq .Template "devtest" }}
                 {{ template "devtest" $ }}
             {{ else if eq .Template "registerstaff" }}
@@ -428,6 +508,8 @@
             {{ else if eq .Template "help" }}
                 {{ $.Set "Commands" $customCommands }}
                 {{ template "help" $ }}
+            {{ else if eq .Template "downtime" }}
+                {{ template "downtime" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
