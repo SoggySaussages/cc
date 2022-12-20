@@ -421,7 +421,7 @@
     "Aliases" cslice
     "Template" "devtest"
     "Args" ( cslice )
-    "Description" "A command restricted to staff, its function varies"
+    "Description" "A command restricted to staff, its function varies. Members who have been registered by an administrator with `registerstaff` can use these commands."
 )
 ( sdict
     "Type" "Command"
