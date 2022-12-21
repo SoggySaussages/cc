@@ -13,7 +13,7 @@
     "required" false
 ) ) }}
 {{ else }}
-    {{ $silent := sendModal "title" "Close Ticket" "customid" "submitClose" "fields" ( cslice ( ( field
+    {{ $silent := sendModal "title" "Close Ticket" "customid" "submitClose" "fields" ( cslice ( field
         "style" 1
         "label" "Reason for closing"
         "customid" "reason"
