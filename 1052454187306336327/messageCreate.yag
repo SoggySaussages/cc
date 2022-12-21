@@ -723,3 +723,38 @@
         {{ end }}
     {{ end }}
 {{ end }}
+
+{{ block "stickymessage" $ }}
+    {{ with dbGet .Channel.ID "stickymessage" }}
+        {{ $m := .Value.Message }}
+        {{ with .Value.LastID }}
+            {{ deleteMessage nil . }}
+        {{ end }}
+        {{ $id := sendMessageNoEscapeRetID nil $m }}
+        {{ dbSet .Channel.ID "stickymessage" ( sdict 
+            "LastID" $id
+            "Message" $m
+        ) }}
+    {{ end }}
+{{ end }}
+
+{{ dbSet 1055039533932097586 "stickymessage" ( sdict "Message" ( complexMessage
+    "embed" ( cembed
+        "description" "Welcome to the worker search channel! This is the space for workers to post their resumes. Employers are free to contact the above workers with any employment opportunities!\nNote that these are our community workers, not our official staff. Some have been certified by our staff to be legitimate, but always exercise caution when hiring from the community. RedBird Official contractors may be contacted at <#1055049087327674450>\n\nLooking to post or manage your ad posting? Click below!"
+    )
+    "components" ( cslice ( cslice
+        ( button "customid" "setWorkerAd" "label" "Post/Edit my Ad" "style" 1 "emoji" ( emoji "name" "🗒️" ) )
+        ( button "customid" "bumpWorkerAd" "label" "Bump my Ad" "style" 2 )
+        ( button "customid" "deleteWorkerAd" "label" "Remove my Ad" "style" 4 )
+    ) )
+) ) }}
+{{ dbSet 1055039635132260452 "stickymessage" ( sdict "Message" ( complexMessage
+    "embed" ( cembed
+        "description" "Welcome to the job search channel! This is the space for employers to create their job postings. Workers are free to contact the above employers with any employment opportunities!\nNote that these are our community employers. Some have been certified by our staff to be legitimate, but always exercise caution when working for the community. RedBird Official contractors may be contacted at <#1055049087327674450>\n\nLooking to post or manage your ad posting? Click below!"
+    )
+    "components" ( cslice ( cslice
+        ( button "customid" "setEmployerAd" "label" "Post/Edit my Ad" "style" 1 "emoji" ( emoji "name" "🗒️" ) )
+        ( button "customid" "bumpEmployerAd" "label" "Bump my Ad" "style" 2 )
+        ( button "customid" "deleteEmployerAd" "label" "Remove my Ad" "style" 4 )
+    ) )
+) ) }}
