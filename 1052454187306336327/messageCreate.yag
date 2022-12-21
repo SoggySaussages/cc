@@ -554,7 +554,7 @@
     "Trigger" "AppendButton"
     "Aliases" ( cslice "button" "apbtn" )
     "Template" "button"
-    "Args" ( cslice ( sdict "Optional" false "Type" "number" "Name" "Message ID" ) ( sdict "Optional" false "Type" "text" "Name" "Button Label" ) ( sdict "Optional" false "Type" "text" "Name" "Button ID" ) ( sdict "Optional" true "Type" "number" "Name" "Style" ) )
+    "Args" ( cslice ( sdict "Optional" false "Type" "number" "Name" "Message ID" ) ( sdict "Optional" false "Type" "text" "Name" "Button ID" ) ( sdict "Optional" false "Type" "text" "Name" "Button Label" ) ( sdict "Optional" true "Type" "number" "Name" "Style" ) )
     "Description" "Adds a button to the given message"
     "RequiredPerms" ( sdict "Readable" "Manage Messages" "Bitwise" .Permissions.ManageMessages )
 )
