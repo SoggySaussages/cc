@@ -9,7 +9,6 @@
     "label" "Anything else we should know?"
     "customid" "notes"
     "placeholder" "My staff member was very helpful"
-    "required" false
 ) ) ) }}
 {{ else }}
     {{ $silent := sendModal "title" "Close Ticket" "customid" "submitClose" "fields" ( cslice ( cslice ( field

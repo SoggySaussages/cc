@@ -1,2 +1,8 @@
 {{/* sendMessage 1051352470221230141 ( complexMessage "content" ( json .Interaction ) ) */}}
-{{ execAdmin "ticket close" }}
+{{ range .Interaction.ModalSubmitData.Components }}
+    {{ if eq .CustomID "reason" }}
+        {{ execAdmin "ticket close" .Value }}
+    {{ else }}
+        {{ sendMessage 1055061850854805504 ( printf "Notes from %s's recent ticket:\n%s" $.User.String .Value ) }}
+    {{ end }}
+{{ end }}
