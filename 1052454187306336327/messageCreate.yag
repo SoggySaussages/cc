@@ -730,7 +730,8 @@
         {{ with .Value.LastID }}
             {{ deleteMessage nil . }}
         {{ end }}
-        {{ $id := sendMessageNoEscapeRetID nil $m }}
+        {{ $id := sendMessageRetID nil $m }}
+        {{ $id := sendMessageRetID nil ( complexMessage "content" "dbg.sm" ) }}
         {{ dbSet $.Channel.ID "stickymessage" ( sdict 
             "LastID" $id
             "Message" $m
