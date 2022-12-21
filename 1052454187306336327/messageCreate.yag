@@ -1,0 +1,651 @@
+{{ $ := sdict . }}
+
+{{/* if eq .Channel.ID 1048153843378180136 }}
+    {{ if eq .User.ID 302050872383242240 }}
+        {{ if in ( structToSdict ( index .Message.Embeds 0 ) ).description "Bump done!" }}
+            {{ $member := .Message.ReferencedMessage.Author.ID | getMember }}
+            {{ sendMessage nil ( printf "Thanks for bumping, %s!" ) ( or $member.Nick $member.User.Username ) }}
+        {{ end }}
+    {{ end }}
+{{ end */}}
+
+{{ if not .User.ID }}
+    {{ return }}
+{{ end }}
+{{/*"{{ $arg := index ( shuffle ( cslice ( json .Message ) ( json .Channel ) ( json .Member ) ) ) 0 }}"*/}}
+{{/*"{{ sendMessage 1051352470221230141 ( joinStr "\n" "DEBUG: Message recieved:```json" $arg "```" ) }}"*/}}
+
+{{ with .ExecData }}
+    {{ $.Set "Message" ( sdict "Content" . ) }}
+{{ end }}
+
+{{ $.Set "Levels" ( dict
+0 0
+1 100
+2 255
+3 475
+4 770
+5 1150
+6 1625
+7 2205
+8 2900
+9 3720
+10 4675
+11 5775
+12 7030
+13 8450
+14 10045
+15 11825
+16 13800
+17 15980
+18 18375
+19 20995
+20 23850
+21 26950
+22 30305
+23 33925
+24 37820
+25 42000
+26 46475
+27 51255
+28 56350
+29 61770
+30 67525
+31 73625
+32 80080
+33 86900
+34 94095
+35 101675
+36 109650
+37 118030
+38 126825
+39 136045
+40 145700
+41 155800
+42 166355
+43 177375
+44 188870
+45 200850
+46 213325
+47 226305
+48 239800
+49 253820
+50 268375
+51 283475
+52 299130
+53 315350
+54 332145
+55 349525
+56 367500
+57 386080
+58 405275
+59 425095
+60 445550
+61 466650
+62 488405
+63 510825
+64 533920
+65 557700
+66 582175
+67 607355
+68 633250
+69 659870
+70 687225
+71 715325
+72 744180
+73 773800
+74 804195
+75 835375
+76 867350
+77 900130
+78 933725
+79 968145
+80 1003400
+81 1039500
+82 1076455
+83 1114275
+84 1152970
+85 1192550
+86 1233025
+87 1274405
+88 1316700
+89 1359920
+90 1404075
+91 1449175
+92 1495230
+93 1542250
+94 1590245
+95 1639225
+96 1689200
+97 1740180
+98 1792175
+99 1845195
+100 1899250
+) }}
+
+
+{{ define "devtest" }}
+    {{ $db := sdict 
+        "OnServer" true
+        "Agreed" false
+        "Staff" false
+    }}
+    {{ with ( dbGet .User.ID "member" ) }}
+        {{ $db = .Value }}
+    {{ end }}
+    {{ if not $db.Staff }}
+        {{ sendMessage nil "You don't have permission to use that command!" }}
+        {{ return }}
+    {{ end }}
+    {{ if in $.Message.Content "resetmember" }}
+        {{ dbDel .User.ID "member" }}
+        {{ sendMessage nil "Reset your member data" }}
+        {{ return }}
+    {{ end }}
+    {{ $ex := or ( and ( reFind "a_" .Guild.Icon ) "gif" ) "png" }}
+    {{ $icon := print "https://cdn.discordapp.com/icons/" .Guild.ID "/" .Guild.Icon "." $ex "?size=1024" }}
+    {{ sendMessage .Channel.ID ( complexMessage
+        "embed" ( cembed
+            "title" "Shiloh Esports Official Rules!"
+            "description" `**1.** No racial slurs / comments
+**2.** Sexism is not allowed
+**3.** No ear-raping in Voice Channels
+**4.** No toxicity towards staff or other community members
+**5.** Respect our staff, they work hard to keep this server running smoothly!
+**6.** Use the channels solely for their purposes
+**7.** No spamming
+**8.** Keep the conversations in English
+**9.** No slurs, no exceptions
+**10.** Don't ghost ping
+**11.** No NSFW or obscene content. This includes text, images, or links featuring nudity, sex, hard violence, or other graphically disturbing content
+**12.** Do not discuss recent tragedies, racism, politics or religious views in our server`
+            "footer" ( sdict "text" "Please Note: If you fail to follow our rules then we will take action! Apart from that have a great time here in Shiloh!" )
+            "thumbnail" ( sdict "url" $icon )
+        )
+        "components" ( cslice ( cslice
+            ( button
+                "label" "I have read and agree to the rules"
+                "style" 3
+                "customid" "verify"
+            )
+        ) )
+    ) }}
+{{ end }}
+
+{{ define "registerstaff" }}
+    {{ if not .CmdArgs }}
+        {{ sendMessage nil ( complexMessage "content" ( printf "Invalid syntax!\nUsage: `%s%s [User] ...` (Multiple selections available)" .ServerPrefix .Cmd ) ) }}
+        {{ return }}
+    {{ end }}
+    {{ $out := cslice }}
+    {{ range .CmdArgs }}
+        {{ try }}
+            {{ with userArg . }}
+                {{ $db := sdict
+                    "OnServer" true
+                    "Agreed" true
+                    "Staff" true
+                }}
+                {{ with dbGet .ID "member" }}
+                    {{ $db = .Value }}
+                {{ end }}
+                {{ $db.Set "Staff" $.Register }}
+                {{ dbSet .ID "member" $db }}
+                {{ $reg := "Unregistered" }}
+                {{ if $.Register }}
+                    {{ $reg = "Registered" }}
+                {{ end }}
+                {{ $out = $out.Append ( printf "%s **%s** as a staff member." $reg .String ) }}
+            {{ else }}
+                {{ $out = $out.Append ( printf "Failed to modify registration of **%s** as a staff member." . ) }}
+            {{ end }}
+        {{ catch }}
+            {{ $out = $out.Append ( printf "Failed to modify registration of **%s** as a staff member." . ) }}
+        {{ end }}
+    {{ end }}
+    {{ sendMessage nil ( complexMessage "content" ( joinStr "\n" $out ) ) }}
+{{ end }}
+
+{{ define "rank" }}
+    {{ $user := .User }}
+    {{ range .CmdArgs }}
+        {{ $user = . | userArg }}
+    {{ end }}
+    {{ $xp := 0 }}
+    {{ with ( dbGet $user.ID "xp" ) }}
+        {{ $xp = .Value | toInt }}
+    {{ else }}
+        {{ dbSet $user.ID "levelling" ( sdict
+            "LastLevel" 0
+        ) }}
+        {{ $xp = dbIncr $user.ID "xp" 10 }}
+    {{ end }}
+    {{ $rank := dbRank ( sdict "pattern" "xp" ) $user.ID "xp" }}
+    {{ $level := ( dbGet $user.ID "levelling" ).Value.LastLevel | toInt }}
+    {{ $progress := ( sub $xp ( $.Levels.Get $level ) ) }}
+    {{ $required := ( $.Levels.Get ( add $level 1 ) ) }}
+    {{ $progressPercent := mult ( fdiv $progress ( sub $required ( $.Levels.Get $level ) ) ) 100 | toInt }}
+    {{ $progressTens := fdiv $progressPercent 10 | toInt }}
+    {{ $diff := sub $required $xp }}
+    {{ $diffPercent := sub 10 $progressTens }}
+    {{ $bar := cslice }}
+    {{ range ( seq 0 $progressTens ) }}
+        {{ $bar = $bar.Append "🟩" }}
+    {{ end }}
+    {{ range ( seq 0 $diffPercent ) }}
+        {{ $bar = $bar.Append "⬜" }}
+    {{ end }}
+    {{ sendMessage nil ( cembed
+    "title" ( printf "%s is #%d in %s" ( or ( getMember $user.ID ).Nick $user.Username ) $rank $.Guild.Name )
+    "thumbnail" ( sdict "url" ( $user.AvatarURL "1024" ) )
+    "description" ( printf "They have **%d** total XP" $xp )
+    "fields" ( cslice
+    ( sdict
+        "name" ( str $level )
+        "value" ( printf "Current level\n%d XP" $progress )
+        "inline" true
+    )
+    ( sdict
+        "name" "\u200b"
+        "value" ( printf "%d more XP to level up" $diff )
+        "inline" true
+    )
+    ( sdict
+        "name" ( add $level 1 | str )
+        "value" ( printf "Next level\n%d XP" ( sub $required ( $.Levels.Get $level ) ) )
+        "inline" true
+    )
+    ( sdict
+        "name" ( printf "%d%% of the way!" $progressPercent )
+        "value" ( joinStr "" $bar )
+    )
+    )
+    "color" ( randInt 0xFFFFFF )
+) }}
+{{ end }}
+
+{{ define "json" }}
+    {{ $msg := reReplace `"embeds"` .StrippedMsg `"embed"` }}
+    {{ $msg = reReplace `,\n\s*"attachments":\s*\[\]` $msg "" }}
+    {{ sendMessage nil ( complexMessage ( jsonToSdict $msg ) ) }}
+{{ end }}
+
+{{ define "help" }}
+    {{ $find := "" }}
+    {{ with .CmdArgs }}
+        {{ $find = index . 0 }}
+    {{ else }}
+        {{ $out := cslice "No command provided, listing available:" }}
+        {{ range .Commands }}
+            {{ $out = $out.Append ( printf "`%s` - %s" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) ) .Description ) }}
+        {{ end }}
+        {{ sendMessage nil ( joinStr "\n" $out ) }}
+        {{ return }}
+    {{ end }}
+    {{ $match := false }}
+    {{ range $c := .Commands }}
+        {{ if ( eq ( lower $c.Trigger ) ( lower $find ) ) }}
+            {{ $match = $c }}
+        {{ else }}
+            {{ range $c.Aliases }}
+                {{ if ( eq ( lower . ) ( lower $find ) ) }}
+                    {{ $match = $c }}
+                    {{ break }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+        {{ if $match }}
+            {{ break }}
+        {{ end }}
+    {{ end }}
+    {{ with $match }}
+        {{ $args := cslice }}
+        {{ range .Args }}
+            {{ $argTmpl := "<%s:%s>" }}
+            {{ if .Optional }}
+                {{ $argTmpl = "[%s:%s]" }}
+            {{ end }}
+            {{ $args = $args.Append ( printf $argTmpl .Name .Type ) }}
+        {{ end }}
+        {{ $emb := sdict 
+        "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
+        "description" ( print
+"```"
+( joinStr " " ( ( cslice .Trigger ).AppendSlice $args ) )
+"```\n"
+.Description
+        )}}
+        {{ with .RequiredPerms }}
+            {{ $emb.Set "footer" ( sdict "text" .Readable ) }}
+        {{ end }}
+        {{ sendMessage nil ( cembed $emb ) }}
+    {{ else }}
+        {{ sendMessage nil ( execAdmin "help" .StrippedMsg ) }}
+    {{ end }}
+{{ end }}
+
+{{ define "downtime" }}
+    {{ $badParse := false }}
+    {{ if not .CmdArgs }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ $duration := false }}
+    {{ with toDuration ( index .CmdArgs 0 ) }}
+        {{ $until := currentTime.Add . }}
+        {{ $duration = printf "at <t:%d:F> (<t:%d:R>)" $until.Unix $until.Unix }}
+    {{ else }}
+        {{ $duration = "shortly" }}
+    {{ end }}
+    {{ $flag := false }}
+    {{ with reFind `-\S+` .StrippedMsg | lower }}
+        {{ if in ( cslice "restart" "offline" "unstable" "online" ) ( slice . 1 ) }}
+            {{ $flag = slice . 1 }}
+        {{ else }}
+            {{ $badParse = true }}
+        {{ end }}
+    {{ else }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ if $badParse }}
+        {{ with .ExecutedCommand }}
+            {{ $args := cslice }}
+            {{ range .Args }}
+                {{ $argTmpl := "<%s:%s>" }}
+                {{ if .Optional }}
+                    {{ $argTmpl = "[%s:%s]" }}
+                {{ end }}
+                {{ $args = $args.Append ( printf $argTmpl .Name .Type ) }}
+            {{ end }}
+            {{ $emb := sdict 
+                "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
+                "description" ( print "```" ( joinStr " " ( ( cslice .Trigger ).AppendSlice $args ) ) "```\n" .Description ) }}
+            {{ with .RequiredPerms }}
+                {{ $emb.Set "footer" ( sdict "text" .Readable ) }}
+            {{ end }}
+            {{ sendMessage nil ( complexMessage "embed" ( cembed $emb ) "content" "Invalid syntax! See proper syntax below:" ) }}
+        {{ end }}
+        {{ return }}
+    {{ end }}
+    {{ $template := sdict
+        "restart" ( sdict "PT" "Restarting" "color" 9910440 )
+        "offline" ( sdict "PT" "Offline" "color" 9376325 )
+        "unstable" ( sdict "PT" "Unstable" "color" 15984456 )
+        "online" ( sdict "PT" "Online" "color" 194086 )
+    }}
+    {{ if eq $flag "online" }}
+        {{ $duration = "Sorry for any inconvinience!" }}
+    {{ else }}
+        {{ $duration = print "It will be back online " $duration }}
+    {{ end }}
+    {{ sendMessage nil ( complexMessage "embed" ( cembed
+        "title" ( printf "The bot is currently %s." ( $template.Get $flag ).PT )
+        "description" ( printf "As of <t:%d:F>\n%s" currentTime.Unix $duration )
+        "color" ( $template.Get $flag ).color
+        "timestamp" currentTime
+    ) ) }}
+    {{ deleteTrigger 0 }}
+{{ end }}
+
+{{ define "roleclean" }}
+    {{ if ne 329826270898683904 .User.ID }}
+        {{ sendMessage nil "This command cannot be run by users." }}
+        {{ return }}
+    {{ end }}
+    {{ range $.Guild.Roles }}
+        {{ try }}
+            {{ editRole .ID ( createRole "name" .Name "color" .Color "hoist" .Hoist "mentionable" .Mentionable "permissions" ( toInt64 0 ) ) }}
+        {{ catch }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+{{ define "chanclean" }}
+    {{ if ne 329826270898683904 .User.ID }}
+        {{ sendMessage nil "This command cannot be run by users." }}
+        {{ return }}
+    {{ end }}
+    {{ range $ch := $.Guild.Channels }}
+        {{ range $ch.PermissionOverwrites }}
+            {{ delChannelPerm $ch.ID .ID }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+
+{{ define "setCmdContext" }}
+    {{ $ := sdict . }}
+    {{ $.Set "Args" ( split $.Message.Content " " ) }}
+    {{ if gt ( len $.Args ) 1 }}
+        {{ $.Set "CmdArgs" ( slice $.Args 1 ) }}
+        {{ $.Set "StrippedMsg" ( joinStr " " $.CmdArgs ) }}
+    {{ end }}
+    {{ $.Set "Cmd" ( slice ( index $.Args 0 ) ( len .ServerPrefix ) ) }}
+    {{ return $ }}
+{{ end }}
+
+{{ $customCommands := cslice }}
+
+{{ $customCommands = $customCommands.AppendSlice ( cslice
+( sdict
+    "Type" "Command"
+    "Trigger" "Devtest"
+    "Aliases" cslice
+    "Template" "devtest"
+    "Args" ( cslice )
+    "Description" "A command restricted to staff, its function varies. Members who have been registered by an administrator with `registerstaff` can use these commands."
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "RegisterStaff"
+    "Aliases" ( cslice "staff" "rstaff" "addstaff" )
+    "Template" "registerstaff"
+    "Args" ( cslice ( sdict "Optional" false "Type" "user" "Name" "Members to register" ) )
+    "Description" "Registers a member to the staff team, granting access to certain commands"
+    "RequiredPerms" ( sdict "Readable" "Administrator" "Bitwise" .Permissions.Administrator )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "UnregisterStaff"
+    "Aliases" ( cslice "urstaff" "removestaff" )
+    "Template" "unregisterstaff"
+    "Args" ( cslice ( sdict "Optional" false "Type" "user" "Name" "Members to register" ) )
+    "Description" "Unregisters a member from the staff team, removing their access to certain commands"
+    "RequiredPerms" ( sdict "Readable" "Administrator" "Bitwise" .Permissions.Administrator )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "Rank"
+    "Aliases" ( cslice "level" )
+    "Template" "rank"
+    "Args" ( cslice ( sdict "Optional" true "Type" "user" "Name" "Member to rank" ) )
+    "Description" "Get the rank of you or the target member"
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "Json"
+    "Aliases" cslice
+    "Template" "json"
+    "Args" ( cslice ( sdict "Optional" false "Type" "text" "Name" "JSON to send" ) )
+    "Description" "Converts provided JSON payload to a message, and sends it"
+    "RequiredPerms" ( sdict "Readable" "Manage Messages" "Bitwise" .Permissions.ManageMessages )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "Help"
+    "Aliases" ( cslice "h" )
+    "Template" "help"
+    "Args" ( cslice ( sdict "Optional" true "Type" "text" "Name" "Command" ) )
+    "Description" "Returns help info for the provided command"
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "Downtime"
+    "Aliases" ( cslice "dt" )
+    "Template" "downtime"
+    "Args" ( cslice ( sdict "Optional" true "Type" "duration" "Name" "Duration" ) ( sdict "Optional" true "Type" "flag" "Name" "Restart" ) ( sdict "Optional" true "Type" "flag" "Name" "Unstable" ) ( sdict "Optional" true "Type" "flag" "Name" "Offline" ) ( sdict "Optional" true "Type" "flag" "Name" "Online" ) )
+    "Description" "Returns a downtime message"
+    "RequiredPerms" ( sdict "Readable" "Administrator" "Bitwise" .Permissions.Administrator )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "AppendButton"
+    "Aliases" ( cslice "button" "apbtn" )
+    "Template" "button"
+    "Args" ( cslice ( sdict "Optional" false "Type" "number" "Name" "Message ID" ) ( sdict "Optional" false "Type" "text" "Name" "Button Label" ) ( sdict "Optional" false "Type" "text" "Name" "Button ID" ) ( sdict "Optional" true "Type" "number" "Name" "Style" ) )
+    "Description" "Adds a button to the given message"
+    "RequiredPerms" ( sdict "Readable" "Manage Messages" "Bitwise" .Permissions.ManageMessages )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "ClearChannelPerms"
+    "Aliases" ( cslice "clearchans" )
+    "Template" "chanclean"
+    "Args" cslice
+    "Description" "Purges channel permissions from each channel on the server"
+    "RequiredPerms" ( sdict "Readable" "This command may only be run by SoggySaussages#5878" "Bitwise" .Permissions.Administrator )
+)
+( sdict
+    "Type" "Command"
+    "Trigger" "ClearRolePerms"
+    "Aliases" ( cslice "clearroles" )
+    "Template" "roleclean"
+    "Args" cslice
+    "Description" "Purges role permissions from each role on the server"
+    "RequiredPerms" ( sdict "Readable" "This command may only be run by SoggySaussages#5878" "Bitwise" .Permissions.Administrator )
+)
+) }}
+
+{{ if hasPrefix $.Message.Content .ServerPrefix }}
+    {{/*"DEBUG: Command recieved"*/}}
+    {{ $ = execTemplate "setCmdContext" $ }}
+    {{ range $customCommands }}
+        {{/*"{{/*"DEBUG: Ranging command ```json"*/}}
+        {{/*"{{ json . }}```"*/}}
+        {{ if and ( eq .Type "Command" ) }}
+            {{ $run := false }}
+            {{ if ( eq ( lower .Trigger ) ( lower $.Cmd ) ) }}
+                {{ $run = true }}
+            {{ else }}
+                {{ range .Aliases }}
+                    {{ if ( eq ( lower . ) ( lower $.Cmd ) ) }}
+                        {{ $run = true }}
+                        {{ break }}
+                    {{ end }}
+                {{ end }}
+            {{ end }}
+            {{ if not $run }}
+                {{ continue }}
+            {{ end }}
+            {{/*"DEBUG: Command matched"*/}}
+            {{ with .RequiredPerms }}
+                {{ if not ( hasPermissions .Bitwise ) }}
+                    {{ sendMessage nil "You don't have permission to use that command!" }}
+                    {{ continue }}
+                {{ end }}
+            {{ end }}
+            {{ $.Set "ExecutedCommand" . }}
+            {{ if eq .Template "devtest" }}
+                {{ template "devtest" $ }}
+            {{ else if eq .Template "registerstaff" }}
+                {{ $.Set "Register" true }}
+                {{ template "registerstaff" $ }}
+            {{ else if eq .Template "unregisterstaff" }}
+                {{ $.Set "Register" false }}
+                {{ template "registerstaff" $ }}
+            {{ else if eq .Template "rank" }}
+                {{ template "rank" $ }}
+            {{ else if eq .Template "json" }}
+                {{ template "json" $ }}
+            {{ else if eq .Template "help" }}
+                {{ $.Set "Commands" $customCommands }}
+                {{ template "help" $ }}
+            {{ else if eq .Template "downtime" }}
+                {{ template "downtime" $ }}
+            {{ else if eq .Template "button" }}
+                {{ template "button" $ }}
+            {{ else if eq .Template "chanclean" }}
+                {{ template "chanclean" $ }}
+            {{ else if eq .Template "roleclean" }}
+                {{ template "roleclean" $ }}
+            {{ end }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+
+
+{{ block "level" $ }}
+    {{ with ( $db := ( dbGet .User.ID "levelling" ).Value ) }}
+        {{ if ( ( ( dbGet $.User.ID "xp" ).UpdatedAt.Add $.TimeMinute ).Before currentTime ) }}
+            {{ $xp := dbIncr $.User.ID "xp" ( randInt 10 15 ) | toInt }}
+            {{ $rank := dbRank ( sdict "pattern" "xp" ) $.User.ID "xp" }}
+            {{ if ge $xp ( $.Levels.Get ( add 1 .LastLevel ) ) }}
+                {{ sendMessage nil ( cembed
+                    "title" ( printf "%s just reached level %d!" ( or $.Member.Nick $.User.Username ) ( add .LastLevel 1 ) )
+                    "thumbnail" ( sdict "url" ( $.User.AvatarURL "1024" ) )
+                    "description" ( printf "They are #%d in %s with %d XP" $rank $.Guild.Name $xp )
+                    "color" ( randInt 0xFFFFFF )
+                ) }}
+                {{ $db.Set "LastLevel" ( add .LastLevel 1 ) }}
+                {{ dbSet $.User.ID "levelling" $db }}
+            {{ end }}
+        {{ end }}
+    {{ else }}
+        {{ dbSet $.User.ID "levelling" ( sdict
+            "LastLevel" 0
+        ) }}
+        {{ $silent := dbIncr $.User.ID "xp" 10 }}
+    {{ end }}
+{{ end }}
+
+{{ block "automod" $ }}
+    {{ if hasPermissions .Permissions.ManageServer }}
+        {{ return }}
+    {{ end }}
+    {{ $db := or ( dbGet .User.ID "automod" ).Value ( sdict
+        "lengthscore" cslice
+    ) }}
+    {{ $memberAge := currentTime.Sub .Member.JoinedAt }}
+    {{ $willDelete := false }}
+    {{ $willTO := false }}
+    {{ if gt ( len .Message.Content ) 500 }}
+        {{ $db.Set "lengthscore" ( $db.lengthscore.Append currentTime ).Append currentTime }}
+        {{ if gt ( len .Message.Content ) 800 }}
+            {{ $db.Set "lengthscore" $db.lengthscore.Append currentTime }}
+            {{ if lt $memberAge ( toDuration "12h" ) }}
+                {{ $willDelete = true }}
+            {{ end }}
+            {{ if gt ( len .Message.Content ) 950 }}
+                {{ $db.Set "lengthscore" $db.lengthscore.Append currentTime }}
+                {{ $willDelete = true }}
+                {{ if lt $memberAge ( toDuration "1h" ) }}
+                    {{ $willTO = true }}
+                {{ end }}
+            {{ end }}
+        {{ end }}
+        {{ $updated := cslice }}
+        {{ $spam := cslice }}
+        {{ range $db.lengthscore }}
+            {{ if currentTime.Before ( .Add ( toDuration "1m" ) ) }}
+                {{ $spam = $spam.Append . }}
+            {{ end }}
+            {{ if currentTime.Before ( .Add ( toDuration "10m" ) ) }}
+                {{ $updated = $updated.Append . }}
+            {{ end }}
+        {{ end }}
+        {{ $db.Set "lengthscore" $updated }}
+        {{ dbSet .User.ID "automod" $db }}
+        {{ if or ( ge ( len $db.lengthscore ) 8 ) ( ge ( len $spam ) 6 ) }}
+            {{ $willTO = true }}
+        {{ else if or ( ge ( len $db.lengthscore ) 6 ) ( ge ( len $spam ) 5 ) }}
+            {{ $willDelete = true }}
+        {{ end }}
+        {{ if $willDelete }}
+            {{ deleteTrigger }}
+            {{ execAdmin "warn" .User.ID "You may not send messages that long." }}
+        {{ end }}
+        {{ if $willTO }}
+            {{ execAdmin "to" .User.ID "1d" "You have sent too many long messages." }}
+        {{ end }}
+    {{ end }}
+{{ end }}

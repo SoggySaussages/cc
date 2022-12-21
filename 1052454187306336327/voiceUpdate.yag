@@ -1,0 +1,39 @@
+{{/* sendMessage 1051352470221230141 ( complexMessage "file" ( printf "DEBUG:\n%s" ( json .VoiceState ) ) ) */}}
+{{ $channel := .VoiceState.ChannelID }}
+{{ $JTCChannels := or ( dbGet 0 "JTCChannels" ).Value cslice }}
+{{ $newChannel := false }}
+{{ if $channel }}
+    {{ $channel = getChannel $channel }}
+    {{ if inFold $channel.Name "join to create" }}
+        {{ $emojis := reFindAll `((<a?:[\w~]{2,32}:\d{17,19}>)|[\x{1f1e6}-\x{1f1ff}]{2}|\p{So}\x{fe0f}?[\x{1f3fb}-\x{1f3ff}]?(\x{200D}\p{So}\x{fe0f}?[\x{1f3fb}-\x{1f3ff}]?)*|[#\d*]\x{FE0F}?\x{20E3})` $channel.Name }}
+        {{ $newChannel = createChannel ( printf "├・%s・%s's Channel" ( index $emojis ( sub ( len $emojis ) 1 ) ) ( or .Member.Nick .User.Username ) ) 2 $channel.ParentID }}
+        {{ moveMember .User.ID $newChannel.ID }}
+    {{ end }}
+{{ end }}
+
+{{ $voiceStateChans := sdict }}
+{{ range .Guild.VoiceStates }}
+    {{ $voiceStateChans.Set ( str .ChannelID ) true }}
+{{ end }}
+{{ range $chans := $JTCChannels }}
+    {{ if not ( $voiceStateChans.Get ( str $chans.ID ) ) }}
+        {{/* sendMessage 1051352470221230141 ( complexMessage "content" ( printf "DEBUG: <#%d> `%d`" $chans.ID $chans.ID ) ) */}}
+        {{ try }}
+            {{ deleteChannel $chans.ID }}
+        {{ catch }}
+        {{ end }}
+        {{ $newChannels := cslice }}
+        {{ range $JTCChannels }}
+            {{ if ne .ID $chans.ID }}
+                {{ $newChannels = $newChannels.Append . }}
+            {{ end }}
+        {{ end }}
+        {{ $JTCChannels = $newChannels }}
+    {{ end }}
+{{ end }}
+{{ with $newChannel }}
+    {{ $JTCChannels = $JTCChannels.Append ( sdict "ID" .ID ) }}
+{{ end }}
+{{ dbSet 0 "JTCChannels" $JTCChannels }}
+{{ sleep 5 }}
+{{ execGitHub "%d/voiceUpdate.yag" .Guild.ID false }}

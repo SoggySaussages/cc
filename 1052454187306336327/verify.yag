@@ -1,0 +1,35 @@
+{{ $db := or ( dbGet .User.ID "member" ).Value (
+    sdict
+    "OnServer" false
+    "Agreed" false
+    "Staff" false
+) }}
+{{ if $db.Agreed }}
+    {{ if $db.AgreedTwice }}
+        {{ $silent := sendResponse ( complexMessage
+            "ephemeral" true
+            "content" ( exec "catfact" )
+        ) }}
+    {{ else }}
+        {{ $silent := sendResponse ( complexMessage
+            "ephemeral" true
+            "content" "You've already agreed to the rules!"
+        ) }}
+        {{ $db.Set "AgreedTwice" true }}
+    {{ end }}
+{{ else }}
+    {{ $silent := sendResponse ( complexMessage
+        "ephemeral" true
+        "content" "Thank you for agreeing to the rules. Welcome to Shiloh!"
+    ) }}
+    {{ addRoleID 1052455338898632735 }}
+    {{ $db.Set "OnServer" true }}
+    {{ $db.Set "Agreed" true }}
+    {{ with $db.WelcomeMsg }}
+        {{ $m := getMessage nil . }}
+        {{ $emb := structToSdict ( index $m.Embeds 0 ) }}
+        {{ $emb.Set "description" ( reReplace `They should get verified in <#1052459120369860618>` $emb.Description "They've gotten verified and are now a member of RedBird Virtual!" ) }}
+        {{ editMessage nil .  }}
+    {{ end }}
+{{ end }}
+{{ dbSet .User.ID "member" $db }}

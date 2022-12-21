@@ -1,0 +1,23 @@
+{{ if eq .User.ID ( dbGet .Channel.ID "ticket" ).Value.AuthorID }}
+{{ $silent := sendModal "title" "Close Ticket" "customid" "submitClose" "fields" ( cslice ( field
+    "style" 1
+    "label" "Reason for closing"
+    "customid" "reason"
+    "placeholder" "Resolved"
+    "required" true
+) ( field
+    "style" 2
+    "label" "Anything else we should know?"
+    "customid" "notes"
+    "placeholder" "My staff member was very helpful"
+    "required" false
+) ) }}
+{{ else }}
+    {{ $silent := sendModal "title" "Close Ticket" "customid" "submitClose" "fields" ( cslice ( field
+        "style" 1
+        "label" "Reason for closing"
+        "customid" "reason"
+        "placeholder" "Resolved"
+        "required" true
+    ) ) }}
+{{ end }}

@@ -1,0 +1,14 @@
+{{ $db := or ( dbGet .User.ID "member" ).Value (
+    sdict
+    "OnServer" false
+    "Agreed" false
+    "Staff" false
+) }}
+{{ $db.Set "OnServer" false }}
+{{ with $db.WelcomeMsg }}
+    {{ $m := getMessage nil . }}
+    {{ $emb := structToSdict ( index $m.Embeds 0 ) }}
+    {{ $emb.Set "description" ( reReplace `They should get verified in <#1052459120369860618>|They've gotten verified and are now a member of RedBird Virtual!` $emb.Description "But now they've left the server :(" ) }}
+    {{ editMessage nil .  }}
+{{ end }}
+{{ dbSet .User.ID "member" $db }}
