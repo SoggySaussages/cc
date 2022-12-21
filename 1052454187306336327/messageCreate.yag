@@ -386,6 +386,57 @@
     {{ deleteTrigger 0 }}
 {{ end }}
 
+{{ define "button" }}
+    {{ $badParse := false }}
+    {{ if lt ( len .CmdArgs ) 2 }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ $message := false }}
+    {{ with getMessage nil ( index .CmdArgs 0 | toInt ) }}
+        {{ $message = . }}
+    {{ else }}
+        {{ $badParse = true }}
+    {{ end }}
+    {{ $cid := index .CmdArgs 1 }}
+    {{ $label := reReplace `\Q\s\E` ( index .CmdArgs 2 ) " " }}
+    {{ $style := 1 }}
+    {{ with index .CmdArgs 3 }}
+        {{ with toInt . }}
+            {{ if and ( ge . 1 ) ( le . 5 ) }}
+                {{ $style = . }}
+            {{ else }}
+                {{ $badParse = true }}
+            {{ end }}
+        {{ else }}
+            {{ $badParse = true }}
+        {{ end }}
+    {{ end }}
+
+    {{ if $badParse }}
+        {{ with .ExecutedCommand }}
+            {{ $args := cslice }}
+            {{ range .Args }}
+                {{ $argTmpl := "<%s:%s>" }}
+                {{ if .Optional }}
+                    {{ $argTmpl = "[%s:%s]" }}
+                {{ end }}
+                {{ $args = $args.Append ( printf $argTmpl .Name .Type ) }}
+            {{ end }}
+            {{ $emb := sdict 
+                "title" ( joinStr "/" ( ( cslice .Trigger ).AppendSlice .Aliases ) )
+                "description" ( print "```" ( joinStr " " ( ( cslice .Trigger ).AppendSlice $args ) ) "```\n" .Description ) }}
+            {{ with .RequiredPerms }}
+                {{ $emb.Set "footer" ( sdict "text" .Readable ) }}
+            {{ end }}
+            {{ sendMessage nil ( complexMessage "embed" ( cembed $emb ) "content" "Invalid syntax! See proper syntax below:" ) }}
+        {{ end }}
+        {{ return }}
+    {{ end }}
+
+    {{ $button := button "customid" $cid "label" $label "style" $style }}
+    {{ editMessage nil $message.ID ( complexMessageEdit "components" ( cslice ( cslice $button ) ) ) }}
+{{ end }}
+
 {{ define "roleclean" }}
     {{ if ne 329826270898683904 .User.ID }}
         {{ sendMessage nil "This command cannot be run by users." }}
