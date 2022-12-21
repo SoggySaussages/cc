@@ -411,6 +411,18 @@
     {{ end }}
 {{ end }}
 
+{{ define "clearochans" }}
+    {{ if ne 329826270898683904 .User.ID }}
+        {{ sendMessage nil "This command cannot be run by users." }}
+        {{ return }}
+    {{ end }}
+    {{ range $ch := $.Guild.Channels }}
+        {{ if not $ch.ParentID }}
+            {{ deleteChannel $ch.ID }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
 
 {{ define "setCmdContext" }}
     {{ $ := sdict . }}
@@ -513,6 +525,15 @@
     "Description" "Purges role permissions from each role on the server"
     "RequiredPerms" ( sdict "Readable" "This command may only be run by SoggySaussages#5878" "Bitwise" .Permissions.Administrator )
 )
+( sdict
+    "Type" "Command"
+    "Trigger" "ClearParentlessChannels"
+    "Aliases" ( cslice "clearochans" )
+    "Template" "clearochans"
+    "Args" cslice
+    "Description" "Deletes any channel that is not in a category"
+    "RequiredPerms" ( sdict "Readable" "This command may only be run by SoggySaussages#5878" "Bitwise" .Permissions.Administrator )
+)
 ) }}
 
 {{ if hasPrefix $.Message.Content .ServerPrefix }}
@@ -567,6 +588,8 @@
                 {{ template "chanclean" $ }}
             {{ else if eq .Template "roleclean" }}
                 {{ template "roleclean" $ }}
+            {{ else if eq .Template "clearochans" }}
+                {{ template "clearochans" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
