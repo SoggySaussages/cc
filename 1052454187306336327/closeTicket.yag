@@ -2,7 +2,7 @@
 {{ $silent := sendModal "title" "Close Ticket" "customid" "submitClose" "fields" ( cslice ( cslice ( field
     "label" "Reason for closing"
     "customid" "reason"
-    "placeholder" "Resolved"
+    "value" "Resolved"
     "required" true
 ) ) ( cslice ( field
     "style" 2
