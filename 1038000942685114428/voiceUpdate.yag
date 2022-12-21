@@ -36,4 +36,4 @@
 {{ end }}
 {{ dbSet 0 "JTCChannels" $JTCChannels }}
 {{ sleep 5 }}
-{{ execGitHub "%d/voiceUpdate.yag" .Guild.ID false }}
+{{ execGitHub ( printf "%d/voiceUpdate.yag" .Guild.ID ) .Channel.ID false }}
