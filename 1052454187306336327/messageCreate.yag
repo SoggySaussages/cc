@@ -731,7 +731,7 @@
             {{ deleteMessage nil . }}
         {{ end }}
         {{ $id := sendMessageNoEscapeRetID nil $m }}
-        {{ dbSet .Channel.ID "stickymessage" ( sdict 
+        {{ dbSet $.Channel.ID "stickymessage" ( sdict 
             "LastID" $id
             "Message" $m
         ) }}
