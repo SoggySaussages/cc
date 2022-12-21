@@ -417,7 +417,7 @@
         {{ return }}
     {{ end }}
     {{ range $ch := $.Guild.Channels }}
-        {{ if not $ch.ParentID }}
+        {{ if and ( not $ch.ParentID ) ( ne $ch.Type 4 ) }}
             {{ deleteChannel $ch.ID }}
         {{ end }}
     {{ end }}
