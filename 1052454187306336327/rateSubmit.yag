@@ -10,7 +10,7 @@
 {{ end }}
 {{ $stars := toInt $modal.rating }}
 {{ if or ( lt $stars 0 ) ( gt $stars 5 ) }}
-    {{ editResponse (
+    {{ $silent := editResponse ( complexMessage
         "content" ( printf "Invalid rating provided (%s) Must be a number between 0 and 5" $modal.rating )
     ) }}
     {{ return }}
@@ -26,7 +26,7 @@
 {{ with $modal.review }}
     {{ $description = ( printf "%s\n\n**Review:**\n%s" $description . ) }}
 {{ end }}
-{{ sendWebhook 1055387362747760660 "zSyp-79qG_T2lcTC8L-VurCDFvqpUqhkJJdMLM1WboxNR0TBbzpxXWQhoINMa2aQxwyS" .User.Username ( .User.AvatarURL "512" ) ( complexMessage
+{{ $silent := sendWebhook 1055387362747760660 "zSyp-79qG_T2lcTC8L-VurCDFvqpUqhkJJdMLM1WboxNR0TBbzpxXWQhoINMa2aQxwyS" .User.Username ( .User.AvatarURL "512" ) ( complexMessage
     "embed" ( cembed
         "title" $starsString
         "description" $description
