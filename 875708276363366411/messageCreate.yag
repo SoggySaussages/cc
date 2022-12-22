@@ -4,7 +4,7 @@
 {{ if if in .Message.Content "lroles" }}
     {{ $out := cslice }}
     {{ range .Guild.Roles }}
-        {{ $out = $out.Append ( printf "%s (`%d`) with perm bitset %d." .Name .ID .Permissions ) }}
+        {{ $out = $out.Append ( printf "**%s** (`%d`) with perm bitset `%d`." .Name .ID .Permissions ) }}
     {{ end }}
     {{ sendMessage nil ( complexMessage "embed" ( cembed "description" ( joinStr "\n" $out ) ) ) }}
 {{ end }}
