@@ -166,7 +166,7 @@
             ( button
                 "label" "I have read and agree to the rules"
                 "style" 3
-                "customid" "templates-verify"
+                "customid" "verify"
             )
         ) )
     ) }}
@@ -609,7 +609,7 @@
     {{ $db := or ( dbGet .User.ID "automod" ).Value ( sdict
         "lengthscore" cslice
     ) }}
-    {{ $memberAge := currentTime.Sub .Member.JoinedAt }}
+    {{ $memberAge := currentTime.Sub .Member.JoinedAt.Parse }}
     {{ $willDelete := false }}
     {{ $willTO := false }}
     {{ if gt ( len .Message.Content ) 500 }}
