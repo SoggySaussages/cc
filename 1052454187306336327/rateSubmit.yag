@@ -12,6 +12,7 @@
 {{ if or ( lt $stars 0 ) ( gt $stars 5 ) }}
     {{ $silent := sendFollowup ( complexMessage
         "content" ( printf "Invalid rating provided (%s) Must be a number between 0 and 5" $modal.rating )
+        "ephemeral" true
     ) }}
     {{ return }}
 {{ end }}
