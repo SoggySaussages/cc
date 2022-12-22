@@ -17,8 +17,10 @@
     "ephemeral" true
 ) }}
 {{ $starsString := "" }}
-{{ range seq 0 $stars }}
-    {{ $starsString = print ( or $starsString "" ) "⭐" }}
+{{ if $stars }}
+    {{ range seq 0 $stars }}
+        {{ $starsString = print ( or $starsString "" ) "⭐" }}
+    {{ end }}
 {{ end }}
 {{ $description := "" }}
 {{ with $modal.service }}
