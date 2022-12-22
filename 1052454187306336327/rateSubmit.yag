@@ -1,4 +1,4 @@
-{{ sendResponse ( complexMessage
+{{ $silent := sendResponse ( complexMessage
     "content" "Thank you for your feedback! We hope you enjoyed your process with RedBird Virtual :)"
     "ephemeral" true
 ) }}
