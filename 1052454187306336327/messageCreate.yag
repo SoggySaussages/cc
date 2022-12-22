@@ -608,8 +608,8 @@
     "Aliases" ( cslice "review" "testimony" )
     "Template" "rate"
     "Args" cslice
-    "Description" "Rate"
-    "RequiredPerms" ( sdict "Readable" "This command may only be run by SoggySaussages#5878" "Bitwise" .Permissions.Administrator )
+    "Description" "Rate the service you recieved from RedBird Virtual!"
+    "RequiredPerms" false
 )
 ) }}
 
