@@ -35,5 +35,3 @@
     {{ $JTCChannels = $JTCChannels.Append ( sdict "ID" .ID ) }}
 {{ end }}
 {{ dbSet 0 "JTCChannels" $JTCChannels }}
-{{ sleep 5 }}
-{{ execGitHub ( printf "%d/voiceUpdate.yag" .Guild.ID ) .Channel.ID false }}
