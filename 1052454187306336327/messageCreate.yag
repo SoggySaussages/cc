@@ -667,8 +667,8 @@
                 {{ template "roleclean" $ }}
             {{ else if eq .Template "clearochans" }}
                 {{ template "clearochans" $ }}
-            {{ else if eq .Template "clearochans" }}
-                {{ template "clearochans" $ }}
+            {{ else if eq .Template "rate" }}
+                {{ template "rate" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
