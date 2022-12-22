@@ -1,7 +1,3 @@
-{{ $silent := sendResponse ( complexMessage
-    "content" "Thank you for your feedback! We hope you enjoyed your process with RedBird Virtual :)"
-    "ephemeral" true
-) }}
 {{ $modal := sdict }}
 {{ range .Interaction.ModalSubmitData.Components }}
     {{ with index .Components 0 }}
@@ -10,12 +6,16 @@
 {{ end }}
 {{ $stars := toInt $modal.rating }}
 {{ if or ( lt $stars 0 ) ( gt $stars 5 ) }}
-    {{ $silent := sendFollowup ( complexMessage
+    {{ $silent := sendResponse ( complexMessage
         "content" ( printf "Invalid rating provided (%s) Must be a number between 0 and 5" $modal.rating )
         "ephemeral" true
     ) }}
     {{ return }}
 {{ end }}
+{{ $silent := sendResponse ( complexMessage
+    "content" "Thank you for your feedback! We hope you enjoyed your process with RedBird Virtual :)"
+    "ephemeral" true
+) }}
 {{ $starsString := "" }}
 {{ range seq 0 $stars }}
     {{ $starsString = print ( or $starsString "" ) "⭐" }}
