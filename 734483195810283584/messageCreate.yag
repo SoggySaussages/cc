@@ -12,11 +12,10 @@
         {{ end }}
     {{ end }}
 {{ else if in .Message.Content "lroles" }}
+    {{ sendMessage nil ( complexMessage "content" "DBG trigger" ) }}
     {{ $out := cslice }}
     {{ range .Guild.Roles }}
         {{ $out = $out.Append ( printf "%s (`%d`) with perm bitset %s." .Name .ID .Permissions ) }}
     {{ end }}
-    {{ sendMessage nil ( complexMessage "embed" ( cembed
-        "description" ( joinStr "\n" $out )
-    ) ) }}
+    {{ sendMessage nil ( complexMessage "file" ( joinStr "\n" $out ) ) }}
 {{ end }}
