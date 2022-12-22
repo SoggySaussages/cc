@@ -474,6 +474,23 @@
     {{ end }}
 {{ end }}
 
+{{ define "rate" }}
+    {{ sendMessage nil ( complexMessage
+        "embed" ( cembed
+            "title" "Rate our services!"
+            "color" 16687624
+        )
+        "components" ( cslice ( cslice
+            ( button
+                "label" "Rate"
+                "customid" "rateService"
+                "style" 3
+                "emoji" ( emoji "name" "⭐" )
+            )
+        ) )
+    ) }}
+{{ end }}
+
 
 {{ define "setCmdContext" }}
     {{ $ := sdict . }}
@@ -585,6 +602,15 @@
     "Description" "Deletes any channel that is not in a category"
     "RequiredPerms" ( sdict "Readable" "This command may only be run by SoggySaussages#5878" "Bitwise" .Permissions.Administrator )
 )
+( sdict
+    "Type" "Command"
+    "Trigger" "Rate"
+    "Aliases" ( cslice "review" "testimony" )
+    "Template" "rate"
+    "Args" cslice
+    "Description" "Rate"
+    "RequiredPerms" ( sdict "Readable" "This command may only be run by SoggySaussages#5878" "Bitwise" .Permissions.Administrator )
+)
 ) }}
 
 {{ if hasPrefix $.Message.Content .ServerPrefix }}
@@ -639,6 +665,8 @@
                 {{ template "chanclean" $ }}
             {{ else if eq .Template "roleclean" }}
                 {{ template "roleclean" $ }}
+            {{ else if eq .Template "clearochans" }}
+                {{ template "clearochans" $ }}
             {{ else if eq .Template "clearochans" }}
                 {{ template "clearochans" $ }}
             {{ end }}

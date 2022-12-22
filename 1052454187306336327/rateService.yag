@@ -1,0 +1,15 @@
+{{ $silent := sendModal "title" "Service Rating" "customid" "rateSubmit" "fields" ( cslice ( cslice ( field
+    "label" "Rating (Out of 5)"
+    "customid" "rating"
+    "placeholder" "0"
+    "required" true
+) ) ( cslice ( field
+"label" "Service provided"
+"customid" "service"
+"placeholder" "Server build"
+) ) ( cslice ( field
+"style" 2
+"label" "Review"
+"customid" "review"
+"placeholder" "My server was running and ready to deploy very quickly!"
+) ) ) }}
