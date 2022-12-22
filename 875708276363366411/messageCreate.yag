@@ -1,12 +1,10 @@
 {{ if ne .User.ID 329826270898683904 }}
     {{ return }}
 {{ end }}
-{{ if eq .Message.Content "-lroles" }}
+{{ if if in .Message.Content "lroles" }}
     {{ $out := cslice }}
     {{ range .Guild.Roles }}
-        {{ $out = $out.Append ( printf "%s (`%d`) with perm bitset %s." .Name .ID .Permissions ) }}
+        {{ $out = $out.Append ( printf "%s (`%d`) with perm bitset %d." .Name .ID .Permissions ) }}
     {{ end }}
-    {{ sendMessage nil ( complexMessage "embed" ( cembed
-        "description" ( joinStr "\n" $out )
-    ) ) }}
+    {{ sendMessage nil ( complexMessage "embed" ( cembed "description" ( joinStr "\n" $out ) ) ) }}
 {{ end }}
