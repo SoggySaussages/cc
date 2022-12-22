@@ -29,7 +29,7 @@
 {{ end }}
 {{ $silent := sendWebhook 1055387362747760660 "zSyp-79qG_T2lcTC8L-VurCDFvqpUqhkJJdMLM1WboxNR0TBbzpxXWQhoINMa2aQxwyS" .User.Username ( .User.AvatarURL "512" ) ( complexMessage
     "embed" ( cembed
-        "title" $starsString
+        "title" ( or $starsString "\u200b" )
         "description" $description
     )
 ) }}
