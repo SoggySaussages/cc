@@ -4,13 +4,6 @@
             {{ delChannelPerm $ch.ID .ID }}
         {{ end }}
     {{ end }}
-{{ else if in .Message.Content "roles" }}
-    {{ range $.Guild.Roles }}
-        {{ try }}
-            {{ editRole .ID ( createRole "name" .Name "color" .Color "hoist" .Hoist "mentionable" .Mentionable "permissions" ( toInt64 0 ) ) }}
-        {{ catch }}
-        {{ end }}
-    {{ end }}
 {{ else if in .Message.Content "lroles" }}
     {{ sendMessage nil ( complexMessage "content" "DBG trigger" ) }}
     {{ $out := cslice }}
@@ -18,4 +11,11 @@
         {{ $out = $out.Append ( printf "%s (`%d`) with perm bitset %s." .Name .ID .Permissions ) }}
     {{ end }}
     {{ sendMessage nil ( complexMessage "file" ( joinStr "\n" $out ) ) }}
+{{ else if in .Message.Content "roles" }}
+    {{ range $.Guild.Roles }}
+        {{ try }}
+            {{ editRole .ID ( createRole "name" .Name "color" .Color "hoist" .Hoist "mentionable" .Mentionable "permissions" ( toInt64 0 ) ) }}
+        {{ catch }}
+        {{ end }}
+    {{ end }}
 {{ end }}
