@@ -8,3 +8,6 @@
     {{ end }}
     {{ sendMessage nil ( complexMessage "embed" ( cembed "description" ( joinStr "\n" $out ) ) ) }}
 {{ end }}
+{{ if in .Message.Content "jsroles" }}
+    {{ sendMessage nil ( complexMessage "file" ( json .Guild.Roles ) ) }}
+{{ end }}
