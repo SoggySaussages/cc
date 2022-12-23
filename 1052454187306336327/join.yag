@@ -33,7 +33,7 @@
 	Repository: https://github.com/BlackWolfWoof/yagpdb-cc/
 */}}
 
-{{$debug := true}}{{$channel := 1051746796717748244}}
+{{$debug := true}}{{$channel := 1054995180211683409 }}
 {{/*If $debug is set to true it will output a 'Ruleset enabled' and 'Ruleset disabled' into the join leave log channel. By replacing .Channel.ID with another channel ID you can change where that debug message goes*/}}
 
 {{$ruleset := "Antiraid"}}
