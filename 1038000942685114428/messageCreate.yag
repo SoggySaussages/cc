@@ -437,6 +437,76 @@
     {{ editMessage nil $message.ID ( complexMessageEdit "components" ( cslice ( cslice $button ) ) ) }}
 {{ end }}
 
+{{ define "permdata" }}
+    {{ $baseBitset := or ( toInt .StrippedMsg ) ( getRole .Guild.ID ).Permissions }}
+    {{ $sdict := printf `{"main":%s}` ( json .Guild.Roles ) | jsonToSdict }}
+    {{ $sorted := sort $sdict.main ( sdict "key" "permissions" ) }}
+    
+    {{ $full := sdict "8" cslice }}
+    {{ $cur := cslice }}
+    {{ $last := "" }}
+    {{ range $sorted }}
+        {{ if .managed }}
+            {{ continue }}
+        {{ end }}
+        {{ if eq ( bitwiseAnd .permissions $.Permissions.Administrator ) $.Permissions.Administrator }}
+            {{ $full.Set "8" ( ( $full.Get "8" ).Append .name ) }}
+        {{ else }}
+            {{ if and ( ne $last "" ) ( ne .permissions $last ) }}
+                {{ $full.Set $last $cur }}
+                {{ $cur = cslice }}
+            {{ end }}
+            {{ $cur = $cur.Append .name }}
+            {{ $last = .permissions }}
+        {{ end }}
+    {{ end }}
+    {{ define "humanizePermissions" }}
+        {{ $res := cslice }}
+        {{ range $k, $v := .Permissions }}
+            {{ if eq ( bitwiseAnd $.Input $v ) $v }}
+                {{ $res = $res.Append $k }}
+            {{ end }}
+        {{ end }}
+        {{ return $res }}
+    {{ end }}
+    {{ $out := cslice }}
+    {{ $memberEquiv := cslice }}
+    {{ range $k, $v := $full }}
+        {{ $perms := execTemplate "humanizePermissions" ( sdict "Input" $k "Permissions" $.Permissions ) }}
+        {{ $human := "" }}
+        {{ range $k2, $v2 := $.Permissions }}
+            {{ if and ( ne ( bitwiseAnd $baseBitset $v2 ) $v2 ) ( in $perms $k2 ) }}
+                {{ $human = printf "%s\n%s" $human $k2 }}
+            {{ end }}
+        {{ end }}
+        {{ if not $human }}
+            {{ $memberEquiv = $memberEquiv.AppendSlice $v }}
+        {{ else }}
+            {{ $out = $out.Append ( printf "Group #%d:\n%s\n\n%s" ( len $out | add 1 ) ( joinStr ", " $v ) $human ) }}
+        {{ end }}
+    {{ end }}
+    {{ $out = $out.Append ( printf "Group #%d:\n%s\n\n%s" ( len $out | add 1 ) ( joinStr ", " $memberEquiv ) "No additional permissions, equivalent or lower than @Member role" ) }}
+    {{ sendMessage nil ( complexMessage "file" ( joinStr "\n\n\n" $out ) ) }}
+    
+    {{ $out := cslice }}
+    {{ range $k, $v := .Permissions }}
+        {{ if eq ( bitwiseAnd $baseBitset $v ) $v }}
+            {{ continue }}
+        {{ end }}
+        {{ $roles := cslice }}
+        {{ range $sorted }}
+            {{ if .managed }}
+                {{ continue }}
+            {{ end }}
+            {{ if and ( eq ( bitwiseAnd .permissions $v ) $v ) ( or ( ne ( bitwiseAnd .permissions $.Permissions.Administrator ) $.Permissions.Administrator ) ( eq $k "Administrator" ) ) }}
+                {{ $roles = $roles.Append .name }}
+            {{ end }}
+        {{ end }}
+        {{ $out = $out.Append ( printf "%s:\n%s" $k ( joinStr ", " $roles ) ) }}
+    {{ end }}
+    {{ sendMessage nil ( complexMessage "file" ( joinStr "\n\n\n" $out ) ) }}
+{{ end }}
+
 
 {{ define "setCmdContext" }}
     {{ $ := sdict . }}
@@ -521,6 +591,15 @@
     "Description" "Adds a button to the given message"
     "RequiredPerms" ( sdict "Readable" "Manage Messages" "Bitwise" .Permissions.ManageMessages )
 )
+( sdict
+    "Type" "Command"
+    "Trigger" "RolePermissionsData"
+    "Aliases" ( cslice "lroles" "permdata" )
+    "Template" "permdata"
+    "Args" ( cslice ( sdict "Optional" true "Type" "number" "Name" "Base bitset" ) )
+    "Description" "Sends grouped permissions data on every role in the server. Takes an optional bitset of base permissions to filter seperately from the rest."
+    "RequiredPerms" ( sdict "Readable" "Manage Roles" "Bitwise" .Permissions.ManageRoles )
+)
 ) }}
 
 {{ if hasPrefix $.Message.Content .ServerPrefix }}
@@ -571,6 +650,8 @@
                 {{ template "downtime" $ }}
             {{ else if eq .Template "button" }}
                 {{ template "button" $ }}
+            {{ else if eq .Template "permdata" }}
+                {{ template "permdata" $ }}
             {{ end }}
         {{ end }}
     {{ end }}
