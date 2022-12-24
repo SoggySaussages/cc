@@ -488,19 +488,16 @@
             {{ $last = .permissions }}
         {{ end }}
     {{ end }}
-    {{ define "humanizePermissions" }}
-        {{ $res := cslice }}
-        {{ range $k, $v := .Permissions }}
-            {{ if eq ( bitwiseAnd $.Input $v ) $v }}
-                {{ $res = $res.Append $k }}
-            {{ end }}
-        {{ end }}
-        {{ return $res }}
-    {{ end }}
     {{ $out := cslice }}
     {{ $memberEquiv := cslice }}
     {{ range $k, $v := $full }}
-        {{ $perms := execTemplate "humanizePermissions" ( sdict "Input" $k "Permissions" $.Permissions ) }}
+        {{ $res := cslice }}
+        {{ range $k2, $v2 := .Permissions }}
+            {{ if eq ( bitwiseAnd $k $v2 ) $v2 }}
+                {{ $res = $res.Append $k2 }}
+            {{ end }}
+        {{ end }}
+        {{ $perms := $res }}
         {{ $human := "" }}
         {{ range $k2, $v2 := $.Permissions }}
             {{ if and ( ne ( bitwiseAnd $baseBitset $v2 ) $v2 ) ( in $perms $k2 ) }}
