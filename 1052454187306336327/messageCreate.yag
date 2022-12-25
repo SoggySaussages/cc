@@ -839,3 +839,50 @@
         ( button "customid" "deleteEmployerAd" "label" "Remove my Ad" "style" 4 )
     ) )
 ) ) }}
+
+
+
+{{ define "gnbot" }}
+    {{ if ne ( bitwiseAnd ( getTargetPermissionsIn .User.ID .Channel.ID ) .Permissions.SendMessages ) .Permissions.SendMessages }}
+        {{ return }}
+    {{ end }}
+    {{ $webhooks := getWebhooks .Channel.ID }}
+    {{ $webhook := false }}
+    {{ with $webhooks }}
+        {{ $webhook = index . 0 }}
+    {{ else }}
+        {{ $webhook = createWebhook .Channel.ID }}
+    {{ end }}
+    {{ sendWebhook $webhook.ID $webhook.Token "gn bot 1" "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6xNvAf8AAzxB3Md75ANrR6SHPqSjsR5U9PA&usqp=CAU" ( complexMessage "content" "gn" ) }}
+    {{ sendWebhook $webhook.ID $webhook.Token "gn bot 2" "https://gnsafetysupplies.ca/images/virtuemart/typeless/noimage_500x500.gif" ( complexMessage "content" "gn" ) }}
+    {{ sendWebhook $webhook.ID $webhook.Token "gn bot 3" "https://c8.alamy.com/comp/2AKK7NE/initial-gn-letter-linked-logo-gn-letter-type-logo-design-vector-template-abstract-letter-gn-logo-design-2AKK7NE.jpg" ( complexMessage "content" "gn" ) }}
+{{ end }}
+
+{{ $AutoResponders := cslice }}
+{{ $AutoResponders = $AutoResponders.AppendSlice ( cslice
+    ( sdict
+        "Type" "Regex"
+        "Trigger" "\bgn\b"
+        "Template" "gnbot"
+    )
+) }}
+
+{{ range $AutoResponders }}
+    {{ $run := false }}
+    {{ if eq .Type "Matches" }}
+        {{ $run = eq $.Message.Content .Trigger }}
+    {{ else if eq .Type "Contains" }}
+        {{ $run = inFold $.Message.Content .Trigger }}
+    {{ else if eq .Type "StartsWith" }}
+        {{ $run = hasPrefix $.Message.Content .Trigger }}
+    {{ else if eq .Type "Regex" }}
+        {{ $run = ne ( reFind .Trigger $.Message.Content ) "" }}
+    {{ end }}
+    {{ if not $run }}
+        {{ continue }}
+    {{ end }}
+    {{ $.Set "ExecutedCommand" . }}
+    {{ if eq .Template "gnbot" }}
+        {{ template "gnbot" $ }}
+    {{ end }}
+{{ end }}
