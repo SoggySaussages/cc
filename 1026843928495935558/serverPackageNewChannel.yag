@@ -16,7 +16,7 @@
 )
 "components" ( cslice ( cslice
     ( button
-        "customid" "closeTicket"
+        "customid" "closePackage"
         "label" "Close Channel"
         "style" 2
         "emoji" ( emoji "name" "🔒" )
