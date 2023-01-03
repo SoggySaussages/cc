@@ -5,7 +5,7 @@
     {{ end }}
     {{ delChannelPerm $newChannel.ID .ID }}
 {{ end }}
-{{ dbSet $newChannel.ID "package" .User.ID }}
+{{ dbSet $newChannel.ID "package" ( str .User.ID ) }}
 {{ $silent := setChannelPerm $newChannel.ID false .Guild.ID 0 .Permissions.ReadMessages }}
 {{ $silent := setChannelPerm $newChannel.ID true .User.ID .Permissions.ReadMessages 0 }}
 {{ $silent := setChannelPerm $newChannel.ID false 1058382913357484082 .Permissions.ReadMessages 0 }}

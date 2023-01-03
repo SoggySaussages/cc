@@ -1,4 +1,4 @@
-{{ if eq .User.ID ( dbGet .Channel.ID "package" ).Value }}
+{{ if eq .User.ID ( toInt ( dbGet .Channel.ID "package" ).Value ) }}
 {{ $silent := sendModal "title" "Close Package" "customid" "submitClosePackage" "fields" ( cslice ( cslice ( field
     "label" "Why did you decide not to work with RedBird?"
     "customid" "reason"
