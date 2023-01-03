@@ -1,4 +1,12 @@
-{{ $options := cslice 
+{{ range $newChannel.PermissionOverwrites }}
+    {{ if eq .ID $.Guild.ID }}
+        {{ continue }}
+    {{ end }}
+    {{ delChannelPerm $newChannel.ID .ID }}
+{{ end }}
+{{ $silent := setChannelPerm $newChannel.ID false .Guild.ID 0 .Permissions.ReadMessages }}
+{{ $silent := setChannelPerm $newChannel.ID true .User.ID .Permissions.ReadMessages 0 }}
+{{ $silent := setChannelPerm $newChannel.ID false 1055030541772132392 .Permissions.ReadMessages 0 }}{{ $options := cslice 
 ( sdict
     "Title" "Basic Package"
     "PriceUSD" 11.99

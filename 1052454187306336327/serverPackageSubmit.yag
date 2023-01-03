@@ -1,13 +1,4 @@
 {{ $newChannel := createChannel ( print .User.Username "'s-discord-server" ) 0 1055015297955930129 }}
-{{ range $newChannel.PermissionOverwrites }}
-    {{ if eq .ID $.Guild.ID }}
-        {{ continue }}
-    {{ end }}
-    {{ delChannelPerm $newChannel.ID .ID }}
-{{ end }}
-{{ $silent := setChannelPerm $newChannel.ID false .Guild.ID 0 .Permissions.ReadMessages }}
-{{ $silent := setChannelPerm $newChannel.ID true .User.ID .Permissions.ReadMessages 0 }}
-{{ $silent := setChannelPerm $newChannel.ID false 1055030541772132392 .Permissions.ReadMessages 0 }}
 {{ setContext "NewChannel" $newChannel }}
 {{ execGitHub ( printf "%d/%s" .Guild.ID "serverPackageNewChannel.yag" ) nil false }}
 {{ $silent := sendResponse ( complexMessage
