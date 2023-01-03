@@ -1,5 +1,5 @@
 {{ $newChannel := createChannel ( print .User.Username "'s-bot" ) 0 1055015297955930129 }}
-{{ setContext "NewChannel" $newChannel }}
+{{ dbSet .User.ID "NewChannel" $newChannel }}
 {{ execGitHub ( printf "%d/%s" .Guild.ID "botDevelopmentPackageNewChannel.yag" ) .Channel.ID false }}
 {{ $silent := sendResponse ( complexMessage
     "ephemeral" true
