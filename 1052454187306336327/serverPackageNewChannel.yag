@@ -1,0 +1,59 @@
+{{ $options := cslice 
+( sdict
+    "Title" "Basic Package"
+    "PriceUSD" 11.99
+)
+( sdict
+    "Title" "All requested bots"
+    "PriceUSD" 2.49
+)
+( sdict
+    "Title" "Application Command Configuration"
+    "PriceUSD" 0.99
+)
+( sdict
+    "Title" "Builtin Automod Configuration"
+    "PriceUSD" 0.99
+)
+( sdict
+    "Title" "Bot Automod Configuration"
+    "PriceUSD" 0.99
+)
+( sdict
+    "Title" "Auto-Logging Configuration"
+    "PriceUSD" 1.49
+)
+( sdict
+    "Title" "Up to 10 Auto-Responders"
+    "PriceUSD" 1.49
+)
+( sdict
+    "Title" "Auto-member filter"
+    "PriceUSD" 1.49
+)
+( sdict
+    "Title" "Automoderation by Time"
+    "PriceUSD" 1.99
+)
+( sdict
+    "Title" "Fully Customized Levelling"
+    "PriceUSD" 3.99
+)
+( sdict
+    "Title" "Advanced Anti-Nuke + Automoderation"
+    "PriceUSD" 4.99
+)
+}}
+{{ $selectedOptions := cslice }}
+{{ $currency = ( dbGet .User.ID "currency" ).Value }}
+{{ $total := 0.0 }}
+{{ range .Interaction.MessageComponentData.Values }}
+    {{ $total = add $total .PriceUSD }}
+    {{ $current := index $options ( sub . 1 ) }}
+    {{ $selectedOptions = $selectedOptions.Append ( printf "**%s** (%0.2f %s)" $current.Title ( mult $current.PriceUSD $currency.Rate ) $currency.Title ) }}
+{{ end }}
+
+{{ sendMessage .NewChannel.ID ( cembed
+    "title" ( print .User.Username "'s Package Summary" )
+    "description" ( printf "%s\n\nTotal price in %s: %0.2f\nTotal price in USD: %0.2f" ( joinStr "\n" $selectedOptions ) $currency.Title ( mult $total $currency.Rate ) $total )
+) }}

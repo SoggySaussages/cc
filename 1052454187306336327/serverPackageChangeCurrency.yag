@@ -1,0 +1,6 @@
+{{ $silent := sendModal "title" "Change Currency" "customid" "serverPackageChangeCurrencySubmit" "fields" ( cslice ( cslice ( field
+    "label" "New Currency Code"
+    "customid" "code"
+    "value" "USD"
+    "required" true
+) ) ) }}

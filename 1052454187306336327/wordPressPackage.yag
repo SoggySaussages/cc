@@ -1,0 +1,16 @@
+{{ $newChannel := createChannel ( print .User.Username "'s-wordpress" ) 0 1055015297955930129 }}
+{{ range $newChannel.PermissionOverwrites }}
+    {{ if eq .ID .Guild.ID }}
+        {{ continue }}
+    {{ end }}
+    {{ delChannelPerm $newChannel.ID .ID }}
+{{ end }}
+{{ $silent := setChannelPerm $newChannel.ID false .Guild.ID 0 .Permissions.ReadMessages }}
+{{ $silent := setChannelPerm $newChannel.ID true .User.ID .Permissions.ReadMessages 0 }}
+{{ $silent := setChannelPerm $newChannel.ID false 1055030554648641636 .Permissions.ReadMessages 0 }}
+{{ setContext "NewChannel" $newChannel }}
+{{ execGitHub ( printf "%d/%s" .Guild.ID "wordPressPackageNewChannel.yag" ) nil false }}
+{{ $silent := sendResponse ( complexMessage
+    "ephemeral" true
+    "content" ( printf "Your channel with the build team has been opened in <#%d>." $newChannel.ID )
+) }}

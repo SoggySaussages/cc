@@ -1,0 +1,96 @@
+{{ $parsedCurrencyCode := upper ( index ( index ( .Interaction.ModalSubmitData.Components ) 0 ).Components 0 ).Value }}
+
+{{ $currency := sdict 
+    "Title" $parsedCurrencyCode
+    "Rate" ( mult ( forex "USD" $parsedCurrencyCode ) )
+}}
+{{ if eq $currency.Rate -1.0 }}
+    {{ $silent := sendResponse ( complexMessage
+        "ephemeral" true
+        "content" "Invalid currency code! Please try again."
+    ) }}
+    {{ return }}
+{{ end }}
+
+{{ $options := cslice 
+( sdict
+    "Title" "Basic Package"
+    "PriceUSD" 11.99
+)
+( sdict
+    "Title" "All requested bots"
+    "PriceUSD" 2.49
+)
+( sdict
+    "Title" "Application Command Configuration"
+    "PriceUSD" 0.99
+)
+( sdict
+    "Title" "Builtin Automod Configuration"
+    "PriceUSD" 0.99
+)
+( sdict
+    "Title" "Bot Automod Configuration"
+    "PriceUSD" 0.99
+)
+( sdict
+    "Title" "Auto-Logging Configuration"
+    "PriceUSD" 1.49
+)
+( sdict
+    "Title" "Up to 10 Auto-Responders"
+    "PriceUSD" 1.49
+)
+( sdict
+    "Title" "Auto-member filter"
+    "PriceUSD" 1.49
+)
+( sdict
+    "Title" "Automoderation by Time"
+    "PriceUSD" 1.99
+)
+( sdict
+    "Title" "Fully Customized Levelling"
+    "PriceUSD" 3.99
+)
+( sdict
+    "Title" "Advanced Anti-Nuke + Automoderation"
+    "PriceUSD" 4.99
+)
+}}
+{{ $optionsFormatted := cslice }}
+{{ $i := 0 }}
+{{ range $options }}
+    {{ $i = $i + 1 }}
+    {{ $optionsFormatted := $optionsFormatted.Append 
+        ( menuOption 
+            "label" ( printf "%s (%0.2f %s)" .Title ( mult .PriceUSD $currency.Rate ) $currency.Title )
+            "value" $i
+        )
+    }}
+{{ end }}
+
+{{ dbSet .User.ID "currency" $currency }}
+
+{{ $silent := editComponentMessage ( complexMessage
+    "ephemeral" true
+    "content" "Looking for a custom server. Got it.\n\nFor the simplicity of our clients, our top server builders have packaged together some of the most highly requested server features into neat bundles for you to pick and choose. They're explained in full in this video: https://cdn.discordapp.com/attachments/1054736380888100885/1055369748516450354/ServerPackage.mov\n\nYou can open the below menu to build your cart, and switch your currency if you need to. RedBird Virtual cares about the real people experience, so you'll also be connected with one of our official server builders who can help quote your specific needs.\n\nFor available currency codes, please see here: https://api.exchangerate.host/symbols"
+    "components" ( cslice 
+        ( cslice
+            ( menu
+                "customid" "serverPackageSubmit"
+                "placeholder" "Build your package"
+                "maxValues" ( len $options )
+                "options" $optionsFormatted
+            )
+        ) 
+        ( cslice
+            ( button 
+                "customid" "serverPackageChangeCurrency"
+                "label" "Change my currency"
+                "style" 2
+                "emoji" ( emoji "name" "💰" )
+            )
+        )    
+    ) 
+) }}
