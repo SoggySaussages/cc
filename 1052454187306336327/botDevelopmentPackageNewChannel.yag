@@ -1,3 +1,4 @@
+{{ $newChannel := getChannel .NewChannel.ID }}
 {{ range $newChannel.PermissionOverwrites }}
     {{ if eq .ID $.Guild.ID }}
         {{ continue }}
