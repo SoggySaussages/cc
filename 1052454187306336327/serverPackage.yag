@@ -52,7 +52,7 @@
 {{ $optionsFormatted := cslice }}
 {{ $i := 0 }}
 {{ range $options }}
-    {{ $i = $i + 1 }}
+    {{ $i = add $i 1 }}
     {{ $optionsFormatted := $optionsFormatted.Append 
         ( menuOption 
             "label" ( printf "%s (%0.2f %s)" .Title ( mult .PriceUSD $currency.Rate ) $currency.Title )
