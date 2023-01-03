@@ -14,7 +14,7 @@
 Logs: %s
 Reason for closing: "%s"
 Other notes: "%s"` $.User.String $logs $reason $notes ) }}
-{{ sendResponse ( complexMessage
+{{ $silent := sendResponse ( complexMessage
     "content" "Thank you for opening a package."
 ) }}
-{{ deleteChannel .Channel.ID }}
+{{ $slent := deleteChannel .Channel.ID }}
