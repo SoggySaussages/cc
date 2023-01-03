@@ -1,0 +1,1 @@
+{{ $silent := sendResponse ( complexMessage "content" ( exec "catfact" ) ) }}

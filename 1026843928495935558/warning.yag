@@ -1,0 +1,45 @@
+{{sendMessage nil (printf "**%s** was warned with reason `%s`" .User.String .Reason)}}
+{{ $db := ( sdict 
+    "Warns" cslice
+    "Mutes" cslice
+    "Kicks" cslice
+    "Bans" cslice
+) }}
+{{ with ( dbGet .User.ID "moderation" ) }}
+    {{ $db = .Value }}
+{{ end }}
+{{ $db.Set "Warns" ( $db.Warns.Append ( sdict
+    "User" .User.ID
+    "Reason" .Reason
+    "Author" .Author.ID
+    "ID" .WarningID
+) ) }}
+{{ $msg := sdict }}
+{{ $msg.Set "User" ( printf "%s `%s`" .User.Mention .User ) }}
+{{ $msg.Set "Channel" ( printf "%s `%s`" .Channel.Mention .Channel.Name ) }}
+{{ $msg.Set "Moderator" ( printf "%s `%s`" .Author.Mention .Author ) }}
+{{ $msg.Set "Logs" ( printf "[Logs](%s)" ( execAdmin "logs" ) ) }}
+{{ range ( cslice "Warns" "Mutes" "Kicks" "Bans" ) }}
+    {{ if ( $db.Get . ) }}
+        {{ $msg.Set "Stats" ( print ( or $msg.Stats "" ) ( printf "%s: %d, " . ( len ( $db.Get . ) ) ) ) }}
+    {{ end }}
+{{ end }}
+{{ $fields := cslice }}
+{{ $fields = $fields.Append ( print "User: " $msg.User ) }}
+{{ $fields = $fields.Append ( print "Where: " $msg.Channel ) }}
+{{ $fields = $fields.Append ( print "Action: " "Warned" ) }}
+{{ $fields = $fields.Append ( print "Moderator: " $msg.Moderator ) }}
+{{ $fields = $fields.Append ( print "Reason: " .Reason ) }}
+{{ $fields = $fields.Append ( print "ID: " .WarningID ) }}
+{{ $fields = $fields.Append ( print "Logs: " $msg.Logs ) }}
+{{ sendMessage ( ( dbGet 0 "mod-log" ).Value | toInt ) ( complexMessage "embed" (
+    cembed
+    "title" .Guild.Name
+    "timestamp" currentTime
+    "footer" ( sdict "text" $msg.Stats )
+    "description" ( joinStr "\n" $fields )
+    "thumbnail" ( sdict "url" ( .User.AvatarURL "1024" ) )
+    "author" ( sdict "icon_url" "https://cdn.discordapp.com/emojis/1052516040438984724.webp?size=240&quality=lossless" "name" "Warned" )
+    "color" 16547631
+) ) }}
+{{ dbSet .User.ID "moderation" $db }}

@@ -1,0 +1,37 @@
+{{ $modal := sdict }}
+{{ range .Interaction.ModalSubmitData.Components }}
+    {{ with index .Components 0 }}
+        {{ $modal.Set .CustomID .Value }}
+    {{ end }}
+{{ end }}
+{{ $stars := toInt $modal.rating }}
+{{ if or ( lt $stars 0 ) ( gt $stars 5 ) }}
+    {{ $silent := sendResponse ( complexMessage
+        "content" ( printf "Invalid rating provided (%s) Must be a number between 0 and 5" $modal.rating )
+        "ephemeral" true
+    ) }}
+    {{ return }}
+{{ end }}
+{{ $silent := sendResponse ( complexMessage
+    "content" "Thank you for your feedback! We hope you enjoyed your process with RedBird Virtual :)"
+    "ephemeral" true
+) }}
+{{ $starsString := "" }}
+{{ if $stars }}
+    {{ range seq 0 $stars }}
+        {{ $starsString = print ( or $starsString "" ) "⭐" }}
+    {{ end }}
+{{ end }}
+{{ $description := "" }}
+{{ with $modal.service }}
+    {{ $description = printf "**Service Provided:**\n%s" . }}
+{{ end }}
+{{ with $modal.review }}
+    {{ $description = ( printf "%s\n\n**Review:**\n%s" $description . ) }}
+{{ end }}
+{{ $silent := sendWebhook 1059768458474168380 "FrtMxtvOc1UdXpVelQDOmrhphQNRED4ZgnA_jc-U5OkHq2GDrr78f0KI876NG2ZH2EUU" .User.Username ( .User.AvatarURL "512" ) ( complexMessage
+    "embed" ( cembed
+        "title" ( or $starsString "\u200b" )
+        "description" $description
+    )
+) }}
