@@ -492,7 +492,7 @@
     {{ $memberEquiv := cslice }}
     {{ range $k, $v := $full }}
         {{ $res := cslice }}
-        {{ range $k2, $v2 := .Permissions }}
+        {{ range $k2, $v2 := $.Permissions }}
             {{ if eq ( bitwiseAnd $k $v2 ) $v2 }}
                 {{ $res = $res.Append $k2 }}
             {{ end }}
