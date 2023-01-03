@@ -7,7 +7,8 @@
 {{ end }}
 {{ $silent := setChannelPerm $newChannel.ID false .Guild.ID 0 .Permissions.ReadMessages }}
 {{ $silent := setChannelPerm $newChannel.ID true .User.ID .Permissions.ReadMessages 0 }}
-{{ $silent := setChannelPerm $newChannel.ID false 1055030541772132392 .Permissions.ReadMessages 0 }}{{ $options := cslice 
+{{ $silent := setChannelPerm $newChannel.ID false 1055030541772132392 .Permissions.ReadMessages 0 }}
+{{ $options := cslice 
 ( sdict
     "Title" "Basic Package"
     "PriceUSD" 11.99
@@ -62,7 +63,7 @@
     {{ $selectedOptions = $selectedOptions.Append ( printf "**%s** (%0.2f %s)" $current.Title ( mult $current.PriceUSD $currency.Rate ) $currency.Title ) }}
 {{ end }}
 
-{{ sendMessage .NewChannel.ID ( cembed
+{{ sendMessage $newChannel.ID ( cembed
     "title" ( print .User.Username "'s Package Summary" )
     "description" ( printf "%s\n\nTotal price in %s: %0.2f\nTotal price in USD: %0.2f" ( joinStr "\n" $selectedOptions ) $currency.Title ( mult $total $currency.Rate ) $total )
 ) }}

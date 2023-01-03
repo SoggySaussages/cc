@@ -7,7 +7,8 @@
 {{ end }}
 {{ $silent := setChannelPerm $newChannel.ID false .Guild.ID 0 .Permissions.ReadMessages }}
 {{ $silent := setChannelPerm $newChannel.ID true .User.ID .Permissions.ReadMessages 0 }}
-{{ $silent := setChannelPerm $newChannel.ID false 1055030554648641636 .Permissions.ReadMessages 0 }}{{ sendMessage .NewChannel.ID ( cembed
+{{ $silent := setChannelPerm $newChannel.ID false 1055030554648641636 .Permissions.ReadMessages 0 }}
+{{ sendMessage $newChannel.ID ( cembed
     "title" ( print .User.Username "'s WordPress Ticket" )
     "description" "Thanks for opening a channel with our team, one of our advisors will drop in to chat about your next WordPress site!"
 ) }}
