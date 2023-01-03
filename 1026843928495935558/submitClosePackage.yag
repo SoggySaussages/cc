@@ -9,7 +9,7 @@
         {{ end }}
     {{ end }}
 {{ end }}
-{{ $logs := execAdmin logs }}
+{{ $logs := execAdmin "logs" }}
 {{ sendMessage 1058389341556179065 ( printf `Notes from %s's recent package:\nLogs:(Logs)[%s]\nReason for closing: "%s"\nOther notes: "%s"` $.User.String $logs $reason $notes ) }}
 {{ sendResponse ( complexMessage
     "content" "Thank you for opening a package."
