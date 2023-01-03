@@ -1,6 +1,6 @@
 {{ $newChannel := createChannel ( print .User.Username "'s-discord-server" ) 0 1055015297955930129 }}
 {{ range $newChannel.PermissionOverwrites }}
-    {{ if eq .ID .Guild.ID }}
+    {{ if eq .ID $.Guild.ID }}
         {{ continue }}
     {{ end }}
     {{ delChannelPerm $newChannel.ID .ID }}
