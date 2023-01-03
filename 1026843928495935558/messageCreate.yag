@@ -473,62 +473,62 @@
     {{ $full := sdict "8" cslice }}
     {{ $cur := cslice }}
     {{ $last := "" }}
-    {{ range $sorted }}
-        {{ if .managed }}
-            {{ continue }}
-        {{ end }}
-        {{ if eq ( bitwiseAnd .permissions $.Permissions.Administrator ) $.Permissions.Administrator }}
-            {{ $full.Set "8" ( ( $full.Get "8" ).Append .name ) }}
-        {{ else }}
-            {{ if and ( ne $last "" ) ( ne .permissions $last ) }}
-                {{ $full.Set $last $cur }}
-                {{ $cur = cslice }}
-            {{ end }}
-            {{ $cur = $cur.Append .name }}
-            {{ $last = .permissions }}
-        {{ end }}
-    {{ end }}
-    {{ $out := cslice }}
-    {{ $memberEquiv := cslice }}
-    {{ range $k, $v := $full }}
-        {{ $res := cslice }}
-        {{ range $k2, $v2 := $.Permissions }}
-            {{ if eq ( bitwiseAnd $k $v2 ) $v2 }}
-                {{ $res = $res.Append $k2 }}
-            {{ end }}
-        {{ end }}
-        {{ $perms := $res }}
-        {{ $human := "" }}
-        {{ range $k2, $v2 := $.Permissions }}
-            {{ if and ( ne ( bitwiseAnd $baseBitset $v2 ) $v2 ) ( in $perms $k2 ) }}
-                {{ $human = printf "%s\n%s" $human $k2 }}
-            {{ end }}
-        {{ end }}
-        {{ if not $human }}
-            {{ $memberEquiv = $memberEquiv.AppendSlice $v }}
-        {{ else }}
-            {{ $out = $out.Append ( printf "Group #%d:\n%s\n\n%s" ( len $out | add 1 ) ( joinStr ", " $v ) $human ) }}
-        {{ end }}
-    {{ end }}
+    {{ range $sorted -}}
+        {{- if .managed -}}
+            {{- continue -}}
+        {{- end -}}
+        {{- if eq ( bitwiseAnd .permissions $.Permissions.Administrator ) $.Permissions.Administrator -}}
+            {{- $full.Set "8" ( ( $full.Get "8" ).Append .name ) -}}
+        {{- else -}}
+            {{- if and ( ne $last "" ) ( ne .permissions $last ) -}}
+                {{- $full.Set $last $cur -}}
+                {{- $cur = cslice -}}
+            {{- end -}}
+            {{- $cur = $cur.Append .name -}}
+            {{- $last = .permissions -}}
+        {{- end -}}
+    {{- end -}}
+    {{- $out := cslice -}}
+    {{- $memberEquiv := cslice -}}
+    {{- range $k, $v := $full -}}
+        {{- $res := cslice -}}
+        {{- range $k2, $v2 := $.Permissions -}}
+            {{- if eq ( bitwiseAnd $k $v2 ) $v2 -}}
+                {{- $res = $res.Append $k2 -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $perms := $res -}}
+        {{- $human := "" -}}
+        {{- range $k2, $v2 := $.Permissions }}
+            {{- if and ( ne ( bitwiseAnd $baseBitset $v2 ) $v2 ) ( in $perms $k2 ) -}}
+                {{- $human = printf "%s\n%s" $human $k2 -}}
+            {{- end -}}
+        {{- end -}}
+        {{- if not $human -}}
+            {{- $memberEquiv = $memberEquiv.AppendSlice $v -}}
+        {{- else -}}
+            {{- $out = $out.Append ( printf "Group #%d:\n%s\n\n%s" ( len $out | add 1 ) ( joinStr ", " $v ) $human ) }}
+        {{- end }}
+    {{- end }}
     {{ $out = $out.Append ( printf "Group #%d:\n%s\n\n%s" ( len $out | add 1 ) ( joinStr ", " $memberEquiv ) "No additional permissions, equivalent or lower than @Member role" ) }}
     {{ sendMessage nil ( complexMessage "file" ( joinStr "\n\n\n" $out ) ) }}
     
     {{ $out := cslice }}
-    {{ range $k, $v := .Permissions }}
-        {{ if eq ( bitwiseAnd $baseBitset $v ) $v }}
-            {{ continue }}
-        {{ end }}
-        {{ $roles := cslice }}
-        {{ range $sorted }}
-            {{ if .managed }}
-                {{ continue }}
-            {{ end }}
-            {{ if and ( eq ( bitwiseAnd .permissions $v ) $v ) ( or ( ne ( bitwiseAnd .permissions $.Permissions.Administrator ) $.Permissions.Administrator ) ( eq $k "Administrator" ) ) }}
-                {{ $roles = $roles.Append .name }}
-            {{ end }}
-        {{ end }}
-        {{ $out = $out.Append ( printf "%s:\n%s" $k ( joinStr ", " $roles ) ) }}
-    {{ end }}
+    {{ range $k, $v := .Permissions -}}
+        {{- if eq ( bitwiseAnd $baseBitset $v ) $v -}}
+            {{- continue -}}
+        {{- end -}}
+        {{- $roles := cslice -}}
+        {{- range $sorted -}}
+            {{- if .managed -}}
+                {{- continue -}}
+            {{- end -}}
+            {{- if and ( eq ( bitwiseAnd .permissions $v ) $v ) ( or ( ne ( bitwiseAnd .permissions $.Permissions.Administrator ) $.Permissions.Administrator ) ( eq $k "Administrator" ) ) -}}
+                {{ $roles = $roles.Append .name -}}
+            {{- end -}}
+        {{- end -}}
+        {{- $out = $out.Append ( printf "%s:\n%s" $k ( joinStr ", " $roles ) ) -}}
+    {{- end }}
     {{ sendMessage nil ( complexMessage "file" ( joinStr "\n\n\n" $out ) ) }}
 {{ end }}
 
