@@ -813,15 +813,15 @@
             {{ deleteMessage nil . }}
         {{ end }}
         {{ $id := sendMessageRetID nil $m }}
-        {{ $id := sendMessageRetID nil ( complexMessage "content" "dbg.sm" ) }}
+        {{ sendMessage nil ( complexMessage "content" "dbg.sm" ) }}
         {{ dbSet $.Channel.ID "stickymessage" ( sdict 
             "LastID" $id
-            "Message" $m
+            "Message" .Value.Message
         ) }}
     {{ end }}
 {{ end }}
 
-{{ dbSet 1055039533932097586 "stickymessage" ( sdict "Message" ( sdict
+{{ dbSet 1058386969366888569 "stickymessage" ( sdict "Message" ( sdict
     "embed" ( cembed
         "description" "Welcome to the worker search channel! This is the space for workers to post their resumes. Employers are free to contact the above workers with any employment opportunities!\nNote that these are our community workers, not our official staff. Some have been certified by our staff to be legitimate, but always exercise caution when hiring from the community. RedBird Official contractors may be contacted at <#1055049087327674450>\n\nLooking to post or manage your ad posting? Click below!"
     )
@@ -831,7 +831,7 @@
         ( button "customid" "deleteWorkerAd" "label" "Remove my Ad" "style" 4 )
     ) )
 ) ) }}
-{{ dbSet 1055039635132260452 "stickymessage" ( sdict "Message" ( sdict
+{{ dbSet 1058386996596330517 "stickymessage" ( sdict "Message" ( sdict
     "embed" ( cembed
         "description" "Welcome to the job search channel! This is the space for employers to create their job postings. Workers are free to contact the above employers with any employment opportunities!\nNote that these are our community employers. Some have been certified by our staff to be legitimate, but always exercise caution when working for the community. RedBird Official contractors may be contacted at <#1055049087327674450>\n\nLooking to post or manage your ad posting? Click below!"
     )
