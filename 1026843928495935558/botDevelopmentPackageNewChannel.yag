@@ -1,0 +1,24 @@
+{{ $newChannel := ( dbGet .User.ID "NewChannel" ).Value }}
+{{ range ( getChannel $newChannel.ParentID ).PermissionOverwrites }}
+    {{ if eq .ID $.Guild.ID }}
+        {{ continue }}
+    {{ end }}
+    {{ delChannelPerm $newChannel.ID .ID }}
+{{ end }}
+{{ dbSet $newChannel.ID "package" .User.ID }}
+{{ $silent := setChannelPerm $newChannel.ID false .Guild.ID 0 .Permissions.ReadMessages }}
+{{ $silent := setChannelPerm $newChannel.ID true .User.ID .Permissions.ReadMessages 0 }}
+{{ $silent := setChannelPerm $newChannel.ID false 1058382909888802856 .Permissions.ReadMessages 0 }}
+{{ sendMessage $newChannel.ID ( complexMessage "embed" ( cembed
+    "title" ( print .User.Username "'s Bot Development Ticket" )
+    "description" "Thanks for opening a channel with our team, one of our advisors will drop in to chat about your next bot!"
+)
+"components" ( cslice ( cslice
+    ( button
+        "customid" "closeTicket"
+        "label" "Close Channel"
+        "style" 2
+        "emoji" ( emoji "name" "🔒" )
+    )
+ )
+) ) }}

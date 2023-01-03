@@ -1,0 +1,18 @@
+{{ if eq .User.ID ( dbGet .Channel.ID "package" ).Value }}
+{{ $silent := sendModal "title" "Close Package" "customid" "submitClosePackage" "fields" ( cslice ( cslice ( field
+    "label" "Why did you decide not to work with RedBird?"
+    "customid" "reason"
+    "placeholder" "Leave blank if you still plan on working with RedBird"
+) ) ( cslice ( field
+    "style" 2
+    "label" "Anything else we should know?"
+    "customid" "notes"
+    "placeholder" "My staff member was very helpful"
+) ) ) }}
+{{ else }}
+    {{ $silent := sendModal "title" "Close Ticket" "customid" "submitClosePackage" "fields" ( cslice ( cslice ( field
+        "label" "Reason for closing"
+        "customid" "reason"
+        "placeholder" "Resolved"
+    ) ) ) }}
+{{ end }}

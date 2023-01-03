@@ -721,6 +721,8 @@
                 {{ template "rate" $ }}
             {{ else if eq .Template "permdata" }}
                 {{ template "permdata" $ }}
+            {{ else if eq .Template "closepackage" }}
+                {{ template "closepackage" $ }}
             {{ end }}
         {{ end }}
     {{ end }}

@@ -1,0 +1,13 @@
+{{ $reason := false }}
+{{ $notes := false }}
+{{ range .Interaction.ModalSubmitData.Components }}
+    {{ with index .Components 0 }}
+        {{ if eq .CustomID "reason" }}
+            {{ $reason = .Value }}
+        {{ else }}
+            {{ $notes = .Value }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+{{ sendMessage 1058389341556179065 ( printf "Notes from %s's recent ticket:\nReason for closing:%s\nOther notes:%s" $.User.String $reason $notes ) }}

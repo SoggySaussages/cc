@@ -1,0 +1,7 @@
+{{ $newChannel := createChannel ( print .User.Username "'s-bot" ) 0 1058386934889709569 }}
+{{ dbSet .User.ID "NewChannel" $newChannel }}
+{{ execGitHub ( printf "%d/%s" .Guild.ID "botDevelopmentPackageNewChannel.yag" ) .Channel.ID false }}
+{{ $silent := sendResponse ( complexMessage
+    "ephemeral" true
+    "content" ( printf "Your channel with the build team has been opened in <#%d>." $newChannel.ID )
+) }}
