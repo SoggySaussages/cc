@@ -1,4 +1,3 @@
-{{/* sendMessage 1051352470221230141 ( complexMessage "file" ( printf "DEBUG:\n%s" ( json .VoiceState ) ) ) */}}
 {{ $channel := .VoiceState.ChannelID }}
 {{ $JTCChannels := or ( dbGet 0 "JTCChannels" ).Value cslice }}
 {{ $newChannel := false }}
@@ -17,7 +16,6 @@
 {{ end }}
 {{ range $chans := $JTCChannels }}
     {{ if not ( $voiceStateChans.Get ( str $chans.ID ) ) }}
-        {{/* sendMessage 1051352470221230141 ( complexMessage "content" ( printf "DEBUG: <#%d> `%d`" $chans.ID $chans.ID ) ) */}}
         {{ try }}
             {{ deleteChannel $chans.ID }}
         {{ catch }}
